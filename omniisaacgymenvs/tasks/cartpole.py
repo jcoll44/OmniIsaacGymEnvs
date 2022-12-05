@@ -134,11 +134,12 @@ class CartpoleTask(RLTask):
         self.progress_buf[env_ids] = 0
 
     def post_reset(self):
-        self._cart_dof_idx = self._cartpoles.get_dof_index("cartJoint")
-        self._pole_dof_idx = self._cartpoles.get_dof_index("poleJoint")
-        # randomize all envs
-        indices = torch.arange(self._cartpoles.count, dtype=torch.int64, device=self._device)
-        self.reset_idx(indices)
+        # self._cart_dof_idx = self._cartpoles.get_dof_index("cartJoint")
+        # self._pole_dof_idx = self._cartpoles.get_dof_index("poleJoint")
+        # # randomize all envs
+        # indices = torch.arange(self._cartpoles.count, dtype=torch.int64, device=self._device)
+        # self.reset_idx(indices)
+        pass
 
     def calculate_metrics(self) -> None:
         cart_pos = self.obs_buf[:, 0]

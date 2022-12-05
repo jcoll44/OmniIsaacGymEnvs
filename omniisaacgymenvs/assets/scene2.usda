@@ -1,0 +1,975 @@
+#usda 1.0
+(
+    customLayerData = {
+        dictionary cameraSettings = {
+            dictionary Front = {
+                double3 position = (50000.000000000015, -1.1102230246251565e-11, 0)
+                double radius = 500
+            }
+            dictionary Perspective = {
+                double3 position = (4.999999999999999, 5, 5.0000000000000036)
+                double3 target = (-8.881784197001252e-16, -2.6645352591003757e-15, 1.7763568394002505e-15)
+            }
+            dictionary Right = {
+                double3 position = (0, -50000, -1.1102230246251565e-11)
+                double radius = 500
+            }
+            dictionary Top = {
+                double3 position = (0, 0, 50000)
+                double radius = 500
+            }
+            string boundCamera = "/OmniverseKit_Persp"
+        }
+        dictionary omni_layer = {
+            dictionary muteness = {
+            }
+        }
+        dictionary renderSettings = {
+        }
+    }
+    doc = """Generated from Composed Stage of root layer /home/jcollins/Documents/OmniIsaacGymEnvs/omniisaacgymenvs/assets/scene2.usda
+"""
+    endTimeCode = 100
+    metersPerUnit = 1
+    startTimeCode = 0
+    timeCodesPerSecond = 24
+    upAxis = "Z"
+)
+
+def Xform "scene" (
+    apiSchemas = ["PhysicsArticulationRootAPI", "PhysxArticulationAPI"]
+    instanceable = false
+)
+{
+    float3 xformOp:rotateXYZ = (0, 0, 0)
+    float3 xformOp:scale = (1, 1, 1)
+    double3 xformOp:translate = (0, 0, 0)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+
+    def Scope "Looks"
+    {
+        def Material "OmniPBR"
+        {
+            token outputs:mdl:displacement.connect = </scene/Looks/OmniPBR/Shader.outputs:out>
+            token outputs:mdl:surface.connect = </scene/Looks/OmniPBR/Shader.outputs:out>
+            token outputs:mdl:volume.connect = </scene/Looks/OmniPBR/Shader.outputs:out>
+
+            def Shader "Shader"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                uniform asset info:mdl:sourceAsset = @OmniPBR.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "OmniPBR"
+                color3f inputs:diffuse_color_constant = (0.01, 0.01, 0.01) (
+                    customData = {
+                        float3 default = (0.2, 0.2, 0.2)
+                    }
+                    displayGroup = "Albedo"
+                    displayName = "Base Color"
+                    doc = "This is the base color"
+                    hidden = false
+                )
+                bool inputs:excludeFromWhiteMode = 0 (
+                    customData = {
+                        bool default = 0
+                    }
+                    displayGroup = "Material Flags"
+                    displayName = "Exclude from White Mode"
+                    hidden = false
+                )
+                token outputs:out
+            }
+        }
+
+        def Material "Oak"
+        {
+            token outputs:mdl:displacement.connect = </scene/Looks/Oak/Shader.outputs:out>
+            token outputs:mdl:surface.connect = </scene/Looks/Oak/Shader.outputs:out>
+            token outputs:mdl:volume.connect = </scene/Looks/Oak/Shader.outputs:out>
+
+            def Shader "Shader"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                uniform asset info:mdl:sourceAsset = @http://omniverse-content-production.s3-us-west-2.amazonaws.com/Materials/Base/Wood/Oak.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "Oak"
+                bool inputs:excludeFromWhiteMode = 0 (
+                    customData = {
+                        bool default = 0
+                    }
+                    displayGroup = "Material Flags"
+                    displayName = "Exclude from White Mode"
+                    hidden = false
+                )
+                token outputs:out
+            }
+        }
+
+        def Material "material_DefaultMaterial"
+        {
+            token outputs:mdl:displacement.connect = </scene/Looks/material_DefaultMaterial/Shader.outputs:out>
+            token outputs:mdl:surface.connect = </scene/Looks/material_DefaultMaterial/Shader.outputs:out>
+            token outputs:mdl:volume.connect = </scene/Looks/material_DefaultMaterial/Shader.outputs:out>
+
+            def Shader "Shader"
+            {
+                reorder properties = ["inputs:diffuse_color_constant", "inputs:diffuse_texture", "inputs:albedo_desaturation", "inputs:albedo_add", "inputs:albedo_brightness", "inputs:diffuse_tint", "inputs:reflection_roughness_constant", "inputs:reflection_roughness_texture_influence", "inputs:reflectionroughness_texture", "inputs:metallic_constant", "inputs:metallic_texture_influence", "inputs:metallic_texture", "inputs:specular_level", "inputs:enable_ORM_texture", "inputs:ORM_texture", "inputs:ao_to_diffuse", "inputs:ao_texture", "inputs:enable_emission", "inputs:emissive_color", "inputs:emissive_color_texture", "inputs:emissive_mask_texture", "inputs:emissive_intensity", "inputs:enable_opacity", "inputs:enable_opacity_texture", "inputs:opacity_constant", "inputs:opacity_texture", "inputs:opacity_mode", "inputs:opacity_threshold", "inputs:bump_factor", "inputs:normalmap_texture", "inputs:detail_bump_factor", "inputs:detail_normalmap_texture", "inputs:flip_tangent_u", "inputs:flip_tangent_v", "inputs:project_uvw", "inputs:world_or_object", "inputs:uv_space_index", "inputs:texture_translate", "inputs:texture_rotate", "inputs:texture_scale", "inputs:detail_texture_translate", "inputs:detail_texture_rotate", "inputs:detail_texture_scale"]
+                uniform token info:id = "UsdPreviewSurface"
+                uniform token info:implementationSource = "sourceAsset"
+                uniform asset info:mdl:sourceAsset = @OmniPBR.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "OmniPBR"
+                float inputs:albedo_add = 0 (
+                    customData = {
+                        float default = 0
+                        dictionary soft_range = {
+                            float max = 1
+                            float min = -1
+                        }
+                    }
+                    displayGroup = "Albedo"
+                    displayName = "Albedo Add"
+                    doc = "Adds a constant value to the diffuse color "
+                    hidden = false
+                )
+                float inputs:albedo_brightness = 1 (
+                    customData = {
+                        float default = 1
+                        dictionary soft_range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "Albedo"
+                    displayName = "Albedo Brightness"
+                    doc = "Multiplier for the diffuse color "
+                    hidden = false
+                )
+                float inputs:albedo_desaturation = 0 (
+                    customData = {
+                        float default = 0
+                        dictionary soft_range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "Albedo"
+                    displayName = "Albedo Desaturation"
+                    doc = "Desaturates the diffuse color"
+                    hidden = false
+                )
+                asset inputs:ao_texture = @@ (
+                    colorSpace = "auto"
+                    customData = {
+                        asset default = @@
+                    }
+                    displayGroup = "AO"
+                    displayName = "Ambient Occlusion Map"
+                    doc = "The Ambient Occlusion texture for the material"
+                    hidden = false
+                )
+                float inputs:ao_to_diffuse = 0 (
+                    customData = {
+                        float default = 0
+                        dictionary range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "AO"
+                    displayName = "AO to Diffuse"
+                    doc = "Controls the amount of ambient occlusion multiplied into the diffuse color channel"
+                    hidden = false
+                )
+                float inputs:bump_factor = 1 (
+                    customData = {
+                        float default = 1
+                        dictionary soft_range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "Normal"
+                    displayName = "Normal Map Strength"
+                    doc = "Strength of normal map."
+                    hidden = false
+                )
+                float inputs:detail_bump_factor = 0.3 (
+                    customData = {
+                        float default = 0.3
+                        dictionary soft_range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "Normal"
+                    displayName = "Detail Normal Strength"
+                    doc = "Strength of the detail normal"
+                    hidden = false
+                )
+                asset inputs:detail_normalmap_texture = @@ (
+                    colorSpace = "auto"
+                    customData = {
+                        asset default = @@
+                    }
+                    displayGroup = "Normal"
+                    displayName = "Detail Normal Map"
+                    hidden = false
+                )
+                float inputs:detail_texture_rotate = 0 (
+                    customData = {
+                        float default = 0
+                    }
+                    displayGroup = "UV"
+                    displayName = "Detail Texture Rotate"
+                    doc = "Rotates angle of the detail texture in degrees."
+                    hidden = false
+                )
+                float2 inputs:detail_texture_scale = (1, 1) (
+                    customData = {
+                        float2 default = (1, 1)
+                    }
+                    displayGroup = "UV"
+                    displayName = "Detail Texture Scale"
+                    doc = "Larger numbers increase the size of the detail texture"
+                    hidden = false
+                )
+                float2 inputs:detail_texture_translate = (0, 0) (
+                    customData = {
+                        float2 default = (0, 0)
+                    }
+                    displayGroup = "UV"
+                    displayName = "Detail Texture Translate"
+                    doc = "Controls the position of the detail texture."
+                    hidden = false
+                )
+                color3f inputs:diffuse_color_constant = (1, 1, 1) (
+                    customData = {
+                        float3 default = (0.2, 0.2, 0.2)
+                    }
+                    displayGroup = "Albedo"
+                    displayName = "Base Color"
+                    doc = "This is the base color"
+                    hidden = false
+                )
+                asset inputs:diffuse_texture = @@ (
+                    colorSpace = "auto"
+                    customData = {
+                        asset default = @@
+                    }
+                    displayGroup = "Albedo"
+                    displayName = "Albedo Map"
+                    hidden = false
+                )
+                color3f inputs:diffuse_tint = (1, 1, 1) (
+                    customData = {
+                        float3 default = (1, 1, 1)
+                    }
+                    displayGroup = "Albedo"
+                    displayName = "Color Tint"
+                    doc = "When enabled, this color value is multiplied over the final albedo color"
+                    hidden = false
+                )
+                color3f inputs:emissive_color = (1, 0.1, 0.1) (
+                    customData = {
+                        float3 default = (1, 0.1, 0.1)
+                    }
+                    displayGroup = "Emissive"
+                    displayName = "Emissive Color"
+                    doc = "The emission color"
+                    hidden = false
+                )
+                asset inputs:emissive_color_texture = @@ (
+                    colorSpace = "auto"
+                    customData = {
+                        asset default = @@
+                    }
+                    displayGroup = "Emissive"
+                    displayName = "Emissive Color map"
+                    doc = "The emissive color texture"
+                    hidden = false
+                )
+                float inputs:emissive_intensity = 40 (
+                    customData = {
+                        float default = 40
+                    }
+                    displayGroup = "Emissive"
+                    displayName = "Emissive Intensity"
+                    doc = "Intensity of the emission"
+                    hidden = false
+                )
+                asset inputs:emissive_mask_texture = @@ (
+                    colorSpace = "auto"
+                    customData = {
+                        asset default = @@
+                    }
+                    displayGroup = "Emissive"
+                    displayName = "Emissive Mask map"
+                    doc = "The texture masking the emissive color"
+                    hidden = false
+                )
+                bool inputs:enable_emission = 0 (
+                    customData = {
+                        bool default = 0
+                    }
+                    displayGroup = "Emissive"
+                    displayName = "Enable Emission"
+                    doc = "Enables the emission of light from the material"
+                    hidden = false
+                )
+                bool inputs:enable_opacity = 0 (
+                    customData = {
+                        bool default = 0
+                    }
+                    displayGroup = "Opacity"
+                    displayName = "Enable Opacity"
+                    doc = "Enables the use of cutout opacity"
+                    hidden = false
+                )
+                bool inputs:enable_opacity_texture = 0 (
+                    customData = {
+                        bool default = 0
+                    }
+                    displayGroup = "Opacity"
+                    displayName = "Enable Opacity Texture"
+                    doc = "Enables or disables the usage of the opacity texture map"
+                    hidden = false
+                )
+                bool inputs:enable_ORM_texture = 0 (
+                    customData = {
+                        bool default = 0
+                    }
+                    displayGroup = "Reflectivity"
+                    displayName = "Enable ORM Texture"
+                    doc = "When True the ORM texture will be used to extract the Occlusion, Roughness and Metallic Map"
+                    hidden = false
+                )
+                bool inputs:excludeFromWhiteMode = 0 (
+                    customData = {
+                        bool default = 0
+                    }
+                    displayGroup = "Material Flags"
+                    displayName = "Exclude from White Mode"
+                    hidden = false
+                )
+                bool inputs:flip_tangent_u = 0 (
+                    customData = {
+                        bool default = 0
+                    }
+                    displayGroup = "Normal"
+                    displayName = "Normal Map Flip U Tangent"
+                    hidden = false
+                )
+                bool inputs:flip_tangent_v = 1 (
+                    customData = {
+                        bool default = 1
+                    }
+                    displayGroup = "Normal"
+                    displayName = "Normal Map Flip V Tangent"
+                    hidden = false
+                )
+                float inputs:metallic_constant = 0 (
+                    customData = {
+                        float default = 0
+                        dictionary range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "Reflectivity"
+                    displayName = "Metallic Amount"
+                    doc = "Metallic Material"
+                    hidden = false
+                )
+                asset inputs:metallic_texture = @@ (
+                    colorSpace = "auto"
+                    customData = {
+                        asset default = @@
+                    }
+                    displayGroup = "Reflectivity"
+                    displayName = "Metallic Map"
+                    hidden = false
+                )
+                float inputs:metallic_texture_influence = 0 (
+                    customData = {
+                        float default = 0
+                        dictionary range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "Reflectivity"
+                    displayName = "Metallic Map Influence"
+                    doc = "Blends between the constant value and the lookup of the metallic texture"
+                    hidden = false
+                )
+                asset inputs:normalmap_texture = @@ (
+                    colorSpace = "auto"
+                    customData = {
+                        asset default = @@
+                    }
+                    displayGroup = "Normal"
+                    displayName = "Normal Map"
+                    doc = "Enables the usage of the normalmap texture"
+                    hidden = false
+                )
+                float inputs:opacity_constant = 1 (
+                    customData = {
+                        float default = 1
+                        dictionary range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "Opacity"
+                    displayName = "Opacity Amount"
+                    doc = "Opacity value between 0 and 1, when Opacity Map is not valid"
+                    hidden = false
+                )
+                int inputs:opacity_mode = 1 (
+                    customData = {
+                        int default = 1
+                    }
+                    displayGroup = "Opacity"
+                    displayName = "Opacity Mono Source"
+                    doc = "Determines how to lookup opacity from the supplied texture. mono_alpha, mono_average, mono_luminance, mono_maximum"
+                    hidden = false
+                    renderType = "::base::mono_mode"
+                    sdrMetadata = {
+                        string __SDR__enum_value = "mono_average"
+                        string options = "mono_alpha:0|mono_average:1|mono_luminance:2|mono_maximum:3"
+                    }
+                )
+                asset inputs:opacity_texture = @@ (
+                    colorSpace = "auto"
+                    customData = {
+                        asset default = @@
+                    }
+                    displayGroup = "Opacity"
+                    displayName = "Opacity Map"
+                    hidden = false
+                )
+                float inputs:opacity_threshold = 0 (
+                    customData = {
+                        float default = 0
+                        dictionary range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "Opacity"
+                    displayName = "Opacity Threshold"
+                    doc = "If negative, disable cutout_opacity; if 0, use fractional opacity values 'as is'; if > 0, remap opacity values to 1 when >= threshold and to 0 otherwise"
+                    hidden = false
+                )
+                asset inputs:ORM_texture = @@ (
+                    colorSpace = "auto"
+                    customData = {
+                        asset default = @@
+                    }
+                    displayGroup = "Reflectivity"
+                    displayName = "ORM Map"
+                    doc = "Texture that hae Occlusion, Roughness and Metallic map stored in the respective r, g and b channels"
+                    hidden = false
+                )
+                bool inputs:project_uvw = 0 (
+                    customData = {
+                        bool default = 0
+                    }
+                    displayGroup = "UV"
+                    displayName = "Enable Project UVW Coordinates"
+                    doc = "When enabled, UV coordinates will be generated by projecting them from a coordinate system"
+                    hidden = false
+                )
+                float inputs:reflection_roughness_constant = 0.5 (
+                    customData = {
+                        float default = 0.5
+                        dictionary range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "Reflectivity"
+                    displayName = "Roughness Amount"
+                    doc = "Higher roughness values lead to more blurry reflections"
+                    hidden = false
+                )
+                float inputs:reflection_roughness_texture_influence = 0 (
+                    customData = {
+                        float default = 0
+                        dictionary range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "Reflectivity"
+                    displayName = "Roughness Map Influence"
+                    doc = "Blends between the constant value and the lookup of the roughness texture"
+                    hidden = false
+                )
+                asset inputs:reflectionroughness_texture = @@ (
+                    colorSpace = "auto"
+                    customData = {
+                        asset default = @@
+                    }
+                    displayGroup = "Reflectivity"
+                    displayName = "Roughness Map"
+                    hidden = false
+                )
+                float inputs:specular_level = 0.5 (
+                    customData = {
+                        float default = 0.5
+                        dictionary soft_range = {
+                            float max = 1
+                            float min = 0
+                        }
+                    }
+                    displayGroup = "Reflectivity"
+                    displayName = "Specular"
+                    doc = "The specular level (intensity) of the material"
+                    hidden = false
+                )
+                float inputs:texture_rotate = 0 (
+                    customData = {
+                        float default = 0
+                    }
+                    displayGroup = "UV"
+                    displayName = "Texture Rotate"
+                    doc = "Rotates angle of texture in degrees."
+                    hidden = false
+                )
+                float2 inputs:texture_scale = (1, 1) (
+                    customData = {
+                        float2 default = (1, 1)
+                    }
+                    displayGroup = "UV"
+                    displayName = "Texture Scale"
+                    doc = "Larger number increases size of texture."
+                    hidden = false
+                )
+                float2 inputs:texture_translate = (0, 0) (
+                    customData = {
+                        float2 default = (0, 0)
+                    }
+                    displayGroup = "UV"
+                    displayName = "Texture Translate"
+                    doc = "Controls position of texture."
+                    hidden = false
+                )
+                int inputs:uv_space_index = 0 (
+                    customData = {
+                        int default = 0
+                        dictionary range = {
+                            int max = 3
+                            int min = 0
+                        }
+                    }
+                    displayGroup = "UV"
+                    displayName = "UV Space Index"
+                    doc = "UV Space Index."
+                    hidden = false
+                )
+                bool inputs:world_or_object = 0 (
+                    customData = {
+                        bool default = 0
+                    }
+                    displayGroup = "UV"
+                    displayName = "Enable World Space"
+                    doc = "When set to 'true' uses world space for projection, when 'false' object space is used"
+                    hidden = false
+                )
+                token outputs:out
+            }
+        }
+    }
+
+    def Xform "cone" (
+        instanceable = false
+    )
+    {
+        quatf xformOp:orient = (0.70710677, 0.70710677, 0, 0)
+        float3 xformOp:scale = (0.002, 0.002, 0.002)
+        double3 xformOp:translate = (0.5, 2, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def Scope "Looks"
+        {
+            def Material "Shape_001"
+            {
+                token outputs:displacement.connect = </scene/cone/Looks/Shape_001/Shape_001.outputs:displacement>
+                token outputs:surface.connect = </scene/cone/Looks/Shape_001/Shape_001.outputs:surface>
+
+                def Shader "Shape_001"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    float3 inputs:diffuseColor.connect = </scene/cone/Looks/Shape_001/diffuseTex.outputs:rgb>
+                    float inputs:displacement = 0
+                    color3f inputs:emissiveColor = (0, 0, 0)
+                    float inputs:ior = 1.5
+                    float inputs:metallic = 0
+                    normal3f inputs:normal = (0, 0, 1)
+                    float inputs:occlusion = 1
+                    float inputs:opacity.connect = </scene/cone/Looks/Shape_001/opacityTex.outputs:a>
+                    float inputs:opacityThreshold = 0
+                    float inputs:roughness = 0.5
+                    int inputs:useSpecularWorkflow = 0
+                    token outputs:displacement
+                    token outputs:surface
+                }
+
+                def Shader "diffuseTex"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    float4 inputs:bias = (0, 0, 0, 0)
+                    asset inputs:file = @/home/jcollins/Documents/OmniIsaacGymEnvs/omniisaacgymenvs/assets/Construction_Cone_Diffuse.png@
+                    float4 inputs:scale = (1, 1, 1, 1)
+                    token inputs:sourceColorSpace = "auto" (
+                        allowedTokens = ["auto", "raw", "sRGB"]
+                    )
+                    float2 inputs:st.connect = </scene/cone/Looks/Shape_001/diffuseTex/UsdTransform2d.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float3 outputs:rgb
+
+                    def Shader "TexCoordReader"
+                    {
+                        uniform token info:id = "UsdPrimvarReader_float2"
+                        token inputs:varname = "st"
+                        float2 outputs:result
+                    }
+
+                    def Shader "UsdTransform2d"
+                    {
+                        uniform token info:id = "UsdTransform2d"
+                        float2 inputs:in.connect = </scene/cone/Looks/Shape_001/diffuseTex/TexCoordReader.outputs:result>
+                        float inputs:rotation = 0
+                        float2 inputs:scale = (1, 1)
+                        float2 inputs:translation = (0, 0)
+                        float2 outputs:result
+                    }
+                }
+
+                def Shader "opacityTex"
+                {
+                    uniform token info:id = "UsdUVTexture"
+                    float4 inputs:bias = (0, 0, 0, 0)
+                    asset inputs:file = @/home/jcollins/Documents/OmniIsaacGymEnvs/omniisaacgymenvs/assets/Construction_Cone_Diffuse.png@
+                    float4 inputs:scale = (1, 1, 1, 1)
+                    token inputs:sourceColorSpace = "auto" (
+                        allowedTokens = ["auto", "raw", "sRGB"]
+                    )
+                    float2 inputs:st.connect = </scene/cone/Looks/Shape_001/opacityTex/UsdTransform2d.outputs:result>
+                    token inputs:wrapS = "repeat"
+                    token inputs:wrapT = "repeat"
+                    float outputs:a
+                    float3 outputs:rgb
+
+                    def Shader "TexCoordReader"
+                    {
+                        uniform token info:id = "UsdPrimvarReader_float2"
+                        token inputs:varname = "st"
+                        float2 outputs:result
+                    }
+
+                    def Shader "UsdTransform2d"
+                    {
+                        uniform token info:id = "UsdTransform2d"
+                        float2 inputs:in.connect = </scene/cone/Looks/Shape_001/opacityTex/TexCoordReader.outputs:result>
+                        float inputs:rotation = 0
+                        float2 inputs:scale = (1, 1)
+                        float2 inputs:translation = (0, 0)
+                        float2 outputs:result
+                    }
+                }
+            }
+        }
+
+        def Mesh "Shape_IndexedFaceSet_001"
+        {
+            float3[] extent = [(-99, 0, -99), (99, 428.696, 99)]
+            int[] faceVertexCounts = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+            int[] faceVertexIndices = [41, 9, 47, 47, 49, 10, 41, 47, 10, 10, 42, 3, 41, 10, 3, 1, 41, 3, 2, 4, 57, 57, 18, 2, 44, 13, 73, 73, 25, 44, 50, 48, 112, 112, 32, 50, 7, 38, 98, 98, 26, 7, 6, 43, 23, 22, 61, 5, 14, 101, 39, 40, 0, 15, 11, 51, 36, 37, 70, 12, 45, 8, 28, 29, 110, 46, 76, 19, 58, 59, 104, 77, 84, 24, 72, 71, 119, 83, 92, 33, 113, 114, 66, 93, 85, 27, 99, 100, 52, 86, 16, 74, 53, 54, 102, 17, 21, 82, 109, 108, 60, 20, 30, 87, 62, 63, 111, 31, 35, 97, 118, 117, 69, 34, 304, 78, 105, 147, 141, 353, 351, 359, 146, 152, 145, 357, 358, 365, 153, 158, 149, 362, 363, 371, 159, 163, 154, 367, 366, 322, 162, 167, 160, 318, 319, 326, 168, 173, 166, 324, 325, 332, 174, 178, 172, 330, 331, 342, 179, 185, 180, 344, 343, 378, 184, 191, 188, 381, 380, 384, 190, 198, 195, 388, 389, 391, 199, 206, 201, 395, 394, 399, 205, 143, 413, 406, 407, 138, 144, 151, 419, 412, 411, 142, 150, 156, 424, 417, 418, 148, 157, 165, 428, 422, 420, 155, 164, 171, 434, 427, 426, 161, 170, 177, 439, 433, 432, 169, 176, 182, 444, 440, 438, 175, 181, 186, 450, 445, 446, 183, 187, 193, 457, 452, 451, 189, 192, 196, 465, 459, 461, 194, 197, 202, 471, 466, 467, 200, 203, 136, 405, 472, 473, 204, 137, 208, 213, 268, 214, 218, 271, 221, 223, 272, 227, 230, 274, 232, 236, 276, 237, 242, 279, 241, 247, 278, 246, 252, 277, 249, 257, 275, 253, 260, 273, 258, 264, 270, 263, 209, 269, 140, 207, 401, 400, 352, 139, 281, 314, 81, 116, 286, 280, 280, 80, 116, 106, 307, 305, 340, 88, 56, 103, 79, 312, 313, 308, 107, 75, 303, 299, 300, 135, 56, 56, 78, 300, 55, 134, 339, 374, 94, 67, 90, 341, 130, 128, 123, 64, 68, 89, 129, 65, 124, 373, 285, 115, 91, 96, 292, 287, 95, 375, 291, 126, 329, 320, 321, 120, 127, 337, 334, 327, 328, 125, 338, 132, 345, 335, 333, 336, 131, 296, 379, 346, 347, 133, 297, 350, 284, 290, 289, 356, 348, 354, 288, 294, 295, 364, 355, 360, 293, 376, 377, 370, 361, 369, 372, 122, 121, 323, 368, 383, 298, 302, 301, 385, 382, 386, 306, 309, 310, 390, 387, 397, 317, 282, 283, 349, 398, 392, 311, 315, 316, 396, 393, 215, 210, 402, 403, 408, 216, 219, 217, 409, 410, 414, 220, 224, 222, 415, 416, 421, 225, 229, 226, 425, 423, 429, 228, 234, 231, 431, 430, 435, 233, 239, 235, 437, 436, 442, 238, 245, 240, 443, 441, 449, 244, 251, 243, 448, 447, 455, 250, 256, 248, 454, 453, 460, 255, 261, 254, 456, 458, 464, 262, 266, 259, 462, 463, 470, 267, 211, 265, 468, 469, 404, 212]
+            rel material:binding = </scene/cone/Looks/Shape_001>
+            normal3f[] normals = [(0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, -1, -0), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (1, 0, -0), (1, 0, -0), (1, 0, -0), (1, 0, -0), (1, 0, -0), (1, 0, -0), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (-1, 0, -0), (-1, 0, -0), (-1, 0, -0), (-1, 0, -0), (-1, 0, -0), (-1, 0, -0), (0.70710677, 0, 0.70710677), (0.70710677, 0, 0.70710677), (0.70710677, 0, 0.70710677), (0.70710665, 0, 0.7071069), (0.70710665, 0, 0.7071069), (0.70710665, 0, 0.7071069), (-0.70710677, 0, 0.70710677), (-0.70710677, 0, 0.70710677), (-0.70710677, 0, 0.70710677), (-0.70710665, 0, 0.7071069), (-0.70710665, 0, 0.7071069), (-0.70710665, 0, 0.7071069), (0.70710665, 0, -0.7071069), (0.70710665, 0, -0.7071069), (0.70710665, 0, -0.7071069), (0.70710677, 0, -0.70710677), (0.70710677, 0, -0.70710677), (0.70710677, 0, -0.70710677), (-0.70710677, 0, -0.70710677), (-0.70710677, 0, -0.70710677), (-0.70710677, 0, -0.70710677), (-0.70710665, 0, -0.7071069), (-0.70710665, 0, -0.7071069), (-0.70710665, 0, -0.7071069), (0, 0.707107, 0.7071065), (0, 0.707107, 0.7071065), (0, 0.707107, 0.7071065), (0, 0.70710814, 0.70710546), (0, 0.70710814, 0.70710546), (0, 0.70710814, 0.70710546), (0.707107, 0.7071065, -0), (0.707107, 0.7071065, -0), (0.707107, 0.7071065, -0), (0.7071069, 0.70710665, -0), (0.7071069, 0.70710665, -0), (0.7071069, 0.70710665, -0), (0, 0.707107, -0.7071065), (0, 0.707107, -0.7071065), (0, 0.707107, -0.7071065), (0, 0.70710814, -0.70710546), (0, 0.70710814, -0.70710546), (0, 0.70710814, -0.70710546), (-0.707107, 0.7071065, -0), (-0.707107, 0.7071065, -0), (-0.707107, 0.7071065, -0), (-0.7071069, 0.70710665, -0), (-0.7071069, 0.70710665, -0), (-0.7071069, 0.70710665, -0), (-0.49999857, 0.70710903, 0.49999824), (-0.49999857, 0.70710903, 0.49999824), (-0.49999857, 0.70710903, 0.49999824), (-0.49999762, 0.70710987, 0.4999979), (-0.49999762, 0.70710987, 0.4999979), (-0.49999762, 0.70710987, 0.4999979), (0.4999984, 0.7071088, 0.4999987), (0.4999984, 0.7071088, 0.4999987), (0.4999984, 0.7071088, 0.4999987), (0.49999782, 0.7071101, 0.49999753), (0.49999782, 0.7071101, 0.49999753), (0.49999782, 0.7071101, 0.49999753), (-0.4999984, 0.7071088, -0.4999987), (-0.4999984, 0.7071088, -0.4999987), (-0.4999984, 0.7071088, -0.4999987), (-0.49999782, 0.7071101, -0.49999753), (-0.49999782, 0.7071101, -0.49999753), (-0.49999782, 0.7071101, -0.49999753), (0.49999857, 0.70710903, -0.49999824), (0.49999857, 0.70710903, -0.49999824), (0.49999857, 0.70710903, -0.49999824), (0.49999762, 0.70710987, -0.4999979), (0.49999762, 0.70710987, -0.4999979), (0.49999762, 0.70710987, -0.4999979), (0, 1, -0), (0, 1, -0), (0, 1, -0), (0.95853364, 0.12348288, -0.25683713), (0.95853364, 0.12348288, -0.25683713), (0.95853364, 0.12348288, -0.25683713), (0.95853335, 0.1234828, -0.2568383), (0.95853335, 0.1234828, -0.2568383), (0.95853335, 0.1234828, -0.2568383), (0.70169497, 0.12348287, -0.7016952), (0.70169497, 0.12348287, -0.7016952), (0.70169497, 0.12348287, -0.7016952), (0.70169514, 0.12348287, -0.701695), (0.70169514, 0.12348287, -0.701695), (0.70169514, 0.12348287, -0.701695), (0.25683635, 0.12348286, -0.9585339), (0.25683635, 0.12348286, -0.9585339), (0.25683635, 0.12348286, -0.9585339), (0.25683826, 0.12348283, -0.95853335), (0.25683826, 0.12348283, -0.95853335), (0.25683826, 0.12348283, -0.95853335), (-0.25683725, 0.12348285, -0.9585335), (-0.25683725, 0.12348285, -0.9585335), (-0.25683725, 0.12348285, -0.9585335), (-0.25683835, 0.12348281, -0.95853335), (-0.25683835, 0.12348281, -0.95853335), (-0.25683835, 0.12348281, -0.95853335), (-0.7016952, 0.12348283, -0.70169497), (-0.7016952, 0.12348283, -0.70169497), (-0.7016952, 0.12348283, -0.70169497), (-0.70169514, 0.12348288, -0.7016951), (-0.70169514, 0.12348288, -0.7016951), (-0.70169514, 0.12348288, -0.7016951), (-0.9585336, 0.123482764, -0.2568372), (-0.9585336, 0.123482764, -0.2568372), (-0.9585336, 0.123482764, -0.2568372), (-0.95853335, 0.12348284, -0.25683838), (-0.95853335, 0.12348284, -0.25683838), (-0.95853335, 0.12348284, -0.25683838), (-0.9585337, 0.12348287, 0.256837), (-0.9585337, 0.12348287, 0.256837), (-0.9585337, 0.12348287, 0.256837), (-0.95853335, 0.1234828, 0.25683826), (-0.95853335, 0.1234828, 0.25683826), (-0.95853335, 0.1234828, 0.25683826), (-0.70169497, 0.12348287, 0.7016952), (-0.70169497, 0.12348287, 0.7016952), (-0.70169497, 0.12348287, 0.7016952), (-0.70169514, 0.12348287, 0.701695), (-0.70169514, 0.12348287, 0.701695), (-0.70169514, 0.12348287, 0.701695), (-0.25683683, 0.1234828, 0.9585337), (-0.25683683, 0.1234828, 0.9585337), (-0.25683683, 0.1234828, 0.9585337), (-0.25683856, 0.12348285, 0.9585333), (-0.25683856, 0.12348285, 0.9585333), (-0.25683856, 0.12348285, 0.9585333), (0.2568367, 0.12348287, 0.9585337), (0.2568367, 0.12348287, 0.9585337), (0.2568367, 0.12348287, 0.9585337), (0.25683874, 0.12348277, 0.95853317), (0.25683874, 0.12348277, 0.95853317), (0.25683874, 0.12348277, 0.95853317), (0.7016952, 0.12348265, 0.70169497), (0.7016952, 0.12348265, 0.70169497), (0.7016952, 0.12348265, 0.70169497), (0.7016938, 0.1234828, 0.70169634), (0.7016938, 0.1234828, 0.70169634), (0.7016938, 0.1234828, 0.70169634), (0.590382, 0.7914692, -0.15819459), (0.590382, 0.7914692, -0.15819459), (0.590382, 0.7914692, -0.15819459), (0.5904031, 0.79145426, -0.15819117), (0.5904031, 0.79145426, -0.15819117), (0.5904031, 0.79145426, -0.15819117), (0.4321992, 0.7914634, -0.43219164), (0.4321992, 0.7914634, -0.43219164), (0.4321992, 0.7914634, -0.43219164), (0.43219244, 0.791466, -0.43219376), (0.43219244, 0.791466, -0.43219376), (0.43219244, 0.791466, -0.43219376), (0.15819348, 0.7914647, -0.59038836), (0.15819348, 0.7914647, -0.59038836), (0.15819348, 0.7914647, -0.59038836), (0.15819447, 0.79146546, -0.5903871), (0.15819447, 0.79146546, -0.5903871), (0.15819447, 0.79146546, -0.5903871), (-0.15818547, 0.79146665, -0.59038794), (-0.15818547, 0.79146665, -0.59038794), (-0.15818547, 0.79146665, -0.59038794), (-0.15820122, 0.7914639, -0.5903874), (-0.15820122, 0.7914639, -0.5903874), (-0.15820122, 0.7914639, -0.5903874), (-0.43218786, 0.791468, -0.43219444), (-0.43218786, 0.791468, -0.43219444), (-0.43218786, 0.791468, -0.43219444), (-0.43220344, 0.791461, -0.43219188), (-0.43220344, 0.791461, -0.43219188), (-0.43220344, 0.791461, -0.43219188), (-0.5903831, 0.7914684, -0.15819466), (-0.5903831, 0.7914684, -0.15819466), (-0.5903831, 0.7914684, -0.15819466), (-0.59039396, 0.7914608, -0.15819238), (-0.59039396, 0.7914608, -0.15819238), (-0.59039396, 0.7914608, -0.15819238), (-0.5903718, 0.79147667, 0.15819605), (-0.5903718, 0.79147667, 0.15819605), (-0.5903718, 0.79147667, 0.15819605), (-0.5903947, 0.7914603, 0.15819237), (-0.5903947, 0.7914603, 0.15819237), (-0.5903947, 0.7914603, 0.15819237), (-0.43220124, 0.79146194, 0.43219218), (-0.43220124, 0.79146194, 0.43219218), (-0.43220124, 0.79146194, 0.43219218), (-0.43219244, 0.791466, 0.43219376), (-0.43219244, 0.791466, 0.43219376), (-0.43219244, 0.791466, 0.43219376), (-0.15819356, 0.79146457, 0.5903884), (-0.15819356, 0.79146457, 0.5903884), (-0.15819356, 0.79146457, 0.5903884), (-0.1581949, 0.7914652, 0.5903874), (-0.1581949, 0.7914652, 0.5903874), (-0.1581949, 0.7914652, 0.5903874), (0.15818533, 0.79146695, 0.5903876), (0.15818533, 0.79146695, 0.5903876), (0.15818533, 0.79146695, 0.5903876), (0.15820087, 0.7914638, 0.5903876), (0.15820087, 0.7914638, 0.5903876), (0.15820087, 0.7914638, 0.5903876), (0.43218827, 0.79146683, 0.43219632), (0.43218827, 0.79146683, 0.43219632), (0.43218827, 0.79146683, 0.43219632), (0.4322023, 0.7914621, 0.43219075), (0.4322023, 0.7914621, 0.43219075), (0.4322023, 0.7914621, 0.43219075), (0.59037256, 0.791476, 0.15819602), (0.59037256, 0.791476, 0.15819602), (0.59037256, 0.791476, 0.15819602), (0.5903941, 0.7914607, 0.15819241), (0.5903941, 0.7914607, 0.15819241), (0.5903941, 0.7914607, 0.15819241), (-0.83830184, 0.4967841, 0.22462334), (-0.83830184, 0.4967841, 0.22462334), (-0.83830184, 0.4967841, 0.22462334), (-0.61367834, 0.49678496, 0.61368036), (-0.61367834, 0.49678496, 0.61368036), (-0.61367834, 0.49678496, 0.61368036), (-0.2246243, 0.49678436, 0.83830136), (-0.2246243, 0.49678436, 0.83830136), (-0.2246243, 0.49678436, 0.83830136), (0.22462124, 0.49678472, 0.838302), (0.22462124, 0.49678472, 0.838302), (0.22462124, 0.49678472, 0.838302), (0.61367905, 0.4967848, 0.6136798), (0.61367905, 0.4967848, 0.6136798), (0.61367905, 0.4967848, 0.6136798), (0.8383024, 0.49678317, 0.22462331), (0.8383024, 0.49678317, 0.22462331), (0.8383024, 0.49678317, 0.22462331), (0.83830214, 0.49678355, -0.22462341), (0.83830214, 0.49678355, -0.22462341), (0.83830214, 0.49678355, -0.22462341), (0.6136791, 0.49678472, -0.6136799), (0.6136791, 0.49678472, -0.6136799), (0.6136791, 0.49678472, -0.6136799), (0.2246247, 0.49678436, -0.8383013), (0.2246247, 0.49678436, -0.8383013), (0.2246247, 0.49678436, -0.8383013), (-0.22462122, 0.49678475, -0.8383021), (-0.22462122, 0.49678475, -0.8383021), (-0.22462122, 0.49678475, -0.8383021), (-0.61368, 0.49678355, -0.6136799), (-0.61368, 0.49678355, -0.6136799), (-0.61368, 0.49678355, -0.6136799), (-0.8383012, 0.4967852, -0.22462356), (-0.8383012, 0.4967852, -0.22462356), (-0.8383012, 0.4967852, -0.22462356), (0.95853364, 0.12348278, 0.25683713), (0.95853364, 0.12348278, 0.25683713), (0.95853364, 0.12348278, 0.25683713), (0.95853335, 0.12348284, 0.25683835), (0.95853335, 0.12348284, 0.25683835), (0.95853335, 0.12348284, 0.25683835), (1.0566465e-7, 0.99999994, -0), (1.0566465e-7, 0.99999994, -0), (1.0566465e-7, 0.99999994, -0), (0, 1, -0), (0, 1, -0), (0, 1, -0), (0, 1, -0), (0, 1, -0), (0, 1, -0), (2.641615e-8, 1, -0), (2.641615e-8, 1, -0), (2.641615e-8, 1, -0), (0, 1, -0), (0, 1, -0), (0, 1, -0), (-9.1863285e-8, 1, -0), (-9.1863285e-8, 1, -0), (-9.1863285e-8, 1, -0), (1.0251935e-7, 1, -0), (1.0251935e-7, 1, -0), (1.0251935e-7, 1, -0), (-2.6416194e-8, 1, -0), (-2.6416194e-8, 1, -0), (-2.6416194e-8, 1, -0), (0, 1, -0), (0, 1, -0), (0, 1, -0), (0, 1, -0), (0, 1, -0), (0, 1, -0), (-2.1132924e-7, 1, -0), (-2.1132924e-7, 1, -0), (-2.1132924e-7, 1, -0), (0, 1, -0), (0, 1, -0), (0, 1, -0), (1.0566466e-7, 1, -0), (1.0566466e-7, 1, -0), (1.0566466e-7, 1, -0), (-1.0251935e-7, 1, -0), (-1.0251935e-7, 1, -0), (-1.0251935e-7, 1, -0), (9.1863285e-8, 1, -0), (9.1863285e-8, 1, -0), (9.1863285e-8, 1, -0), (-2.641617e-8, 1, -0), (-2.641617e-8, 1, -0), (-2.641617e-8, 1, -0), (-9.1863285e-8, 1, -0), (-9.1863285e-8, 1, -0), (-9.1863285e-8, 1, -0), (1.0251935e-7, 1, -0), (1.0251935e-7, 1, -0), (1.0251935e-7, 1, -0), (2.641616e-8, 1, -0), (2.641616e-8, 1, -0), (2.641616e-8, 1, -0), (-0.46835408, 0.74919194, -0.4683543), (-0.46835408, 0.74919194, -0.4683543), (-0.46835408, 0.74919194, -0.4683543), (-0.46835372, 0.7491924, -0.4683542), (-0.46835372, 0.7491924, -0.4683542), (-0.46835372, 0.7491924, -0.4683542), (-0.6864629, 0.7035168, -0.1839372), (-0.6864629, 0.7035168, -0.1839372), (-0.6864629, 0.7035168, -0.1839372), (-0.6763435, 0.7148326, -0.17768984), (-0.6763435, 0.7148326, -0.17768984), (-0.6763435, 0.7148326, -0.17768984), (-0.6746609, 0.71564883, 0.18077451), (-0.6746609, 0.71564883, 0.18077451), (-0.6746609, 0.71564883, 0.18077451), (-0.68691134, 0.7039778, 0.18046634), (-0.68691134, 0.7039778, 0.18046634), (-0.68691134, 0.7039778, 0.18046634), (-0.4683538, 0.7491925, 0.4683538), (-0.4683538, 0.7491925, 0.4683538), (-0.4683538, 0.7491925, 0.4683538), (-0.46835366, 0.7491923, 0.46835434), (-0.46835366, 0.7491923, 0.46835434), (-0.46835366, 0.7491923, 0.46835434), (0.68691134, 0.7039778, -0.18046634), (0.68691134, 0.7039778, -0.18046634), (0.68691134, 0.7039778, -0.18046634), (0.674661, 0.7156488, -0.18077452), (0.674661, 0.7156488, -0.18077452), (0.674661, 0.7156488, -0.18077452), (0.46835366, 0.7491923, -0.46835434), (0.46835366, 0.7491923, -0.46835434), (0.46835366, 0.7491923, -0.46835434), (0.4683538, 0.7491925, -0.4683538), (0.4683538, 0.7491925, -0.4683538), (0.4683538, 0.7491925, -0.4683538), (0.17768967, 0.71483266, -0.6763437), (0.17768967, 0.71483266, -0.6763437), (0.17768967, 0.71483266, -0.6763437), (0.1839371, 0.70351666, -0.68646294), (0.1839371, 0.70351666, -0.68646294), (0.1839371, 0.70351666, -0.68646294), (-0.18046622, 0.7039772, -0.68691194), (-0.18046622, 0.7039772, -0.68691194), (-0.18046622, 0.7039772, -0.68691194), (-0.1807748, 0.71564907, -0.6746605), (-0.1807748, 0.71564907, -0.6746605), (-0.1807748, 0.71564907, -0.6746605), (-0.17768975, 0.71483296, 0.6763433), (-0.17768975, 0.71483296, 0.6763433), (-0.17768975, 0.71483296, 0.6763433), (-0.18393718, 0.703517, 0.6864626), (-0.18393718, 0.703517, 0.6864626), (-0.18393718, 0.703517, 0.6864626), (0.18046592, 0.7039779, 0.6869114), (0.18046592, 0.7039779, 0.6869114), (0.18046592, 0.7039779, 0.6869114), (0.18077469, 0.7156507, 0.67465883), (0.18077469, 0.7156507, 0.67465883), (0.18077469, 0.7156507, 0.67465883), (0.676344, 0.71483237, 0.17768972), (0.676344, 0.71483237, 0.17768972), (0.676344, 0.71483237, 0.17768972), (0.6864626, 0.703517, 0.18393727), (0.6864626, 0.703517, 0.18393727), (0.6864626, 0.703517, 0.18393727), (0.4683508, 0.74919593, 0.46835136), (0.4683508, 0.74919593, 0.46835136), (0.4683508, 0.74919593, 0.46835136), (0.46835336, 0.74919176, 0.46835536), (0.46835336, 0.74919176, 0.46835536), (0.46835336, 0.74919176, 0.46835536), (-0.59039426, 0.7914603, 0.15819384), (-0.59039426, 0.7914603, 0.15819384), (-0.59039426, 0.7914603, 0.15819384), (-0.5903816, 0.79146963, 0.15819424), (-0.5903816, 0.79146963, 0.15819424), (-0.5903816, 0.79146963, 0.15819424), (-0.43220302, 0.79146194, 0.43219057), (-0.43220302, 0.79146194, 0.43219057), (-0.43220302, 0.79146194, 0.43219057), (-0.432187, 0.79146796, 0.4321953), (-0.432187, 0.79146796, 0.4321953), (-0.432187, 0.79146796, 0.4321953), (-0.1581957, 0.7914657, 0.59038645), (-0.1581957, 0.7914657, 0.59038645), (-0.1581957, 0.7914657, 0.59038645), (-0.15818584, 0.79146576, 0.59038895), (-0.15818584, 0.79146576, 0.59038895), (-0.15818584, 0.79146576, 0.59038895), (0.15819632, 0.7914644, 0.5903882), (0.15819632, 0.7914644, 0.5903882), (0.15819632, 0.7914644, 0.5903882), (0.15819304, 0.79146594, 0.59038687), (0.15819304, 0.79146594, 0.59038687), (0.15819304, 0.79146594, 0.59038687), (0.43220338, 0.79146165, 0.43219045), (0.43220338, 0.79146165, 0.43219045), (0.43220338, 0.79146165, 0.43219045), (0.43218726, 0.7914687, 0.43219385), (0.43218726, 0.7914687, 0.43219385), (0.43218726, 0.7914687, 0.43219385), (0.59038985, 0.79146343, 0.15819427), (0.59038985, 0.79146343, 0.15819427), (0.59038985, 0.79146343, 0.15819427), (0.59038293, 0.79146856, 0.15819427), (0.59038293, 0.79146856, 0.15819427), (0.59038293, 0.79146856, 0.15819427), (0.5903916, 0.79146224, -0.15819421), (0.5903916, 0.79146224, -0.15819421), (0.5903916, 0.79146224, -0.15819421), (0.59038156, 0.7914697, -0.15819423), (0.59038156, 0.7914697, -0.15819423), (0.59038156, 0.7914697, -0.15819423), (0.43220338, 0.79146194, -0.43219012), (0.43220338, 0.79146194, -0.43219012), (0.43220338, 0.79146194, -0.43219012), (0.43218732, 0.7914685, -0.43219414), (0.43218732, 0.7914685, -0.43219414), (0.43218732, 0.7914685, -0.43219414), (0.15819585, 0.7914661, -0.5903859), (0.15819585, 0.7914661, -0.5903859), (0.15819585, 0.7914661, -0.5903859), (0.15818594, 0.7914656, -0.59038913), (0.15818594, 0.7914656, -0.59038913), (0.15818594, 0.7914656, -0.59038913), (-0.15819624, 0.7914643, -0.59038806), (-0.15819624, 0.7914643, -0.59038806), (-0.15819624, 0.7914643, -0.59038806), (-0.15819295, 0.79146594, -0.5903868), (-0.15819295, 0.79146594, -0.5903868), (-0.15819295, 0.79146594, -0.5903868), (-0.4321944, 0.7914652, -0.432193), (-0.4321944, 0.7914652, -0.432193), (-0.4321944, 0.7914652, -0.432193), (-0.4321869, 0.79146826, -0.4321951), (-0.4321869, 0.79146826, -0.4321951), (-0.4321869, 0.79146826, -0.4321951), (-0.5903893, 0.79146385, -0.15819412), (-0.5903893, 0.79146385, -0.15819412), (-0.5903893, 0.79146385, -0.15819412), (-0.5903804, 0.79147047, -0.15819444), (-0.5903804, 0.79147047, -0.15819444), (-0.5903804, 0.79147047, -0.15819444)] (
+                interpolation = "faceVarying"
+            )
+            point3f[] points = [(-67, 0, 99), (-67, 0, 99), (-67, 0, 99), (67, 0, 99), (67, 0, 99), (67, 0, 99), (67, 0, 99), (-99, 0, -67), (-99, 0, -67), (-99, 0, -67), (99, 0, -67), (99, 0, -67), (99, 0, -67), (99, 0, -67), (-67, 25.91, 99), (-67, 25.91, 99), (-67, 25.91, 99), (-67, 25.91, 99), (-67, 25.91, 99), (-67, 25.91, 99), (99, 25.91, 67), (99, 25.91, 67), (99, 25.91, 67), (99, 25.91, 67), (99, 25.91, 67), (99, 25.91, 67), (-99, 25.91, -67), (-99, 25.91, -67), (-99, 25.91, -67), (-99, 25.91, -67), (-99, 25.91, -67), (-99, 25.91, -67), (67, 25.91, -99), (67, 25.91, -99), (67, 25.91, -99), (67, 25.91, -99), (67, 25.91, -99), (67, 25.91, -99), (-99, 0, 67), (-99, 0, 67), (-99, 0, 67), (-99, 0, 67), (99, 0, 67), (99, 0, 67), (99, 0, 67), (-67, 0, -99), (-67, 0, -99), (-67, 0, -99), (-67, 0, -99), (67, 0, -99), (67, 0, -99), (67, 0, -99), (-95, 29.910002, 65.3431), (-95, 29.910002, 65.3431), (-95, 29.910002, 65.3431), (-95, 29.910002, 65.3431), (-95, 29.910002, 65.3431), (67, 25.91, 99), (67, 25.91, 99), (67, 25.91, 99), (67, 25.91, 99), (67, 25.91, 99), (-65.3431, 29.910002, -95), (-65.3431, 29.910002, -95), (-65.3431, 29.910002, -95), (-65.3431, 29.910002, -95), (-65.3431, 29.910002, -95), (-65.3431, 29.910002, -95), (-65.3431, 29.910002, -95), (99, 25.91, -67), (99, 25.91, -67), (99, 25.91, -67), (99, 25.91, -67), (99, 25.91, -67), (-65.3431, 29.910002, 95), (-65.3431, 29.910002, 95), (-65.3431, 29.910002, 95), (-65.3431, 29.910002, 95), (-65.3431, 29.910002, 95), (95, 29.910002, 65.3431), (95, 29.910002, 65.3431), (95, 29.910002, 65.3431), (95, 29.910002, 65.3431), (95, 29.910002, 65.3431), (95, 29.910002, 65.3431), (-95, 29.910002, -65.3431), (-95, 29.910002, -65.3431), (-95, 29.910002, -65.3431), (-95, 29.910002, -65.3431), (-95, 29.910002, -65.3431), (-95, 29.910002, -65.3431), (65.3431, 29.910002, -95), (65.3431, 29.910002, -95), (65.3431, 29.910002, -95), (65.3431, 29.910002, -95), (65.3431, 29.910002, -95), (65.3431, 29.910002, -95), (65.3431, 29.910002, -95), (-99, 25.91, 67), (-99, 25.91, 67), (-99, 25.91, 67), (-99, 25.91, 67), (-99, 25.91, 67), (65.3431, 29.910002, 95), (65.3431, 29.910002, 95), (65.3431, 29.910002, 95), (65.3431, 29.910002, 95), (65.3431, 29.910002, 95), (65.3431, 29.910002, 95), (65.3431, 29.910002, 95), (-67, 25.91, -99), (-67, 25.91, -99), (-67, 25.91, -99), (-67, 25.91, -99), (-67, 25.91, -99), (95, 29.910002, -65.3431), (95, 29.910002, -65.3431), (95, 29.910002, -65.3431), (95, 29.910002, -65.3431), (95, 29.910002, -65.3431), (-39.536602, 29.910002, -66.1109), (-39.536602, 29.910002, -66.1109), (-39.536602, 29.910002, -66.1109), (-39.536602, 29.910002, -66.1109), (-39.536602, 29.910002, -66.1109), (-66.1109, 29.910002, -39.536602), (-66.1109, 29.910002, -39.536602), (-66.1109, 29.910002, -39.536602), (-66.1109, 29.910002, -39.536602), (-66.1109, 29.910002, -39.536602), (-66.1109, 29.910002, -39.536602), (-66.1109, 29.910002, 39.536602), (-66.1109, 29.910002, 39.536602), (-66.1109, 29.910002, 39.536602), (-66.1109, 29.910002, 39.536602), (-66.1109, 29.910002, 39.536602), (20.3144, 426.00003, 3.5541402e-7), (20.3144, 426.00003, 3.5541402e-7), (20.3144, 426.00003, 3.5541402e-7), (20.3144, 426.00003, 3.5541402e-7), (20.3144, 426.00003, 3.5541402e-7), (20.3144, 426.00003, 3.5541402e-7), (17.5928, 426.00003, -10.1572), (17.5928, 426.00003, -10.1572), (17.5928, 426.00003, -10.1572), (17.5928, 426.00003, -10.1572), (17.5928, 426.00003, -10.1572), (17.5928, 426.00003, -10.1572), (10.1572, 426.00003, -17.5928), (10.1572, 426.00003, -17.5928), (10.1572, 426.00003, -17.5928), (10.1572, 426.00003, -17.5928), (10.1572, 426.00003, -17.5928), (10.1572, 426.00003, -17.5928), (-0.00000764086, 426.00003, -20.3144), (-0.00000764086, 426.00003, -20.3144), (-0.00000764086, 426.00003, -20.3144), (-0.00000764086, 426.00003, -20.3144), (-0.00000764086, 426.00003, -20.3144), (-0.00000764086, 426.00003, -20.3144), (-10.1572, 426.00003, -17.5928), (-10.1572, 426.00003, -17.5928), (-10.1572, 426.00003, -17.5928), (-10.1572, 426.00003, -17.5928), (-10.1572, 426.00003, -17.5928), (-10.1572, 426.00003, -17.5928), (-17.5928, 426.00003, -10.1572), (-17.5928, 426.00003, -10.1572), (-17.5928, 426.00003, -10.1572), (-17.5928, 426.00003, -10.1572), (-17.5928, 426.00003, -10.1572), (-17.5928, 426.00003, -10.1572), (-20.3144, 426.00003, -0.00000271198), (-20.3144, 426.00003, -0.00000271198), (-20.3144, 426.00003, -0.00000271198), (-20.3144, 426.00003, -0.00000271198), (-20.3144, 426.00003, -0.00000271198), (-20.3144, 426.00003, -0.00000271198), (-17.5928, 426.00003, 10.1572), (-17.5928, 426.00003, 10.1572), (-17.5928, 426.00003, 10.1572), (-17.5928, 426.00003, 10.1572), (-17.5928, 426.00003, 10.1572), (-17.5928, 426.00003, 10.1572), (-10.1572, 426.00003, 17.5928), (-10.1572, 426.00003, 17.5928), (-10.1572, 426.00003, 17.5928), (-10.1572, 426.00003, 17.5928), (-10.1572, 426.00003, 17.5928), (-10.1572, 426.00003, 17.5928), (-0.0000161973, 426.00003, 20.3144), (-0.0000161973, 426.00003, 20.3144), (-0.0000161973, 426.00003, 20.3144), (-0.0000161973, 426.00003, 20.3144), (-0.0000161973, 426.00003, 20.3144), (-0.0000161973, 426.00003, 20.3144), (10.1572, 426.00003, 17.5928), (10.1572, 426.00003, 17.5928), (10.1572, 426.00003, 17.5928), (10.1572, 426.00003, 17.5928), (10.1572, 426.00003, 17.5928), (10.1572, 426.00003, 17.5928), (17.5928, 426.00003, 10.1572), (17.5928, 426.00003, 10.1572), (17.5928, 426.00003, 10.1572), (17.5928, 426.00003, 10.1572), (17.5928, 426.00003, 10.1572), (17.5928, 426.00003, 10.1572), (13.086, 426.00003, 6.48709e-7), (13.086, 426.00003, 6.48709e-7), (13.086, 426.00003, 6.48709e-7), (13.086, 426.00003, 6.48709e-7), (13.086, 426.00003, 6.48709e-7), (11.3328, 426.00003, -6.54299), (11.3328, 426.00003, -6.54299), (11.3328, 426.00003, -6.54299), (11.3328, 426.00003, -6.54299), (11.3328, 426.00003, -6.54299), (6.54299, 426.00003, -11.3328), (6.54299, 426.00003, -11.3328), (6.54299, 426.00003, -11.3328), (6.54299, 426.00003, -11.3328), (6.54299, 426.00003, -11.3328), (-0.00000819175, 426.00003, -13.086), (-0.00000819175, 426.00003, -13.086), (-0.00000819175, 426.00003, -13.086), (-0.00000819175, 426.00003, -13.086), (-0.00000819175, 426.00003, -13.086), (-6.543, 426.00003, -11.3328), (-6.543, 426.00003, -11.3328), (-6.543, 426.00003, -11.3328), (-6.543, 426.00003, -11.3328), (-6.543, 426.00003, -11.3328), (-11.3328, 426.00003, -6.54299), (-11.3328, 426.00003, -6.54299), (-11.3328, 426.00003, -6.54299), (-11.3328, 426.00003, -6.54299), (-11.3328, 426.00003, -6.54299), (-13.086, 426.00003, -0.00000132722), (-13.086, 426.00003, -0.00000132722), (-13.086, 426.00003, -0.00000132722), (-13.086, 426.00003, -0.00000132722), (-13.086, 426.00003, -0.00000132722), (-11.3328, 426.00003, 6.54299), (-11.3328, 426.00003, 6.54299), (-11.3328, 426.00003, 6.54299), (-11.3328, 426.00003, 6.54299), (-11.3328, 426.00003, 6.54299), (-6.543, 426.00003, 11.3328), (-6.543, 426.00003, 11.3328), (-6.543, 426.00003, 11.3328), (-6.543, 426.00003, 11.3328), (-6.543, 426.00003, 11.3328), (-0.0000137035995, 426.00003, 13.086), (-0.0000137035995, 426.00003, 13.086), (-0.0000137035995, 426.00003, 13.086), (-0.0000137035995, 426.00003, 13.086), (-0.0000137035995, 426.00003, 13.086), (6.5429797, 426.00003, 11.3328), (6.5429797, 426.00003, 11.3328), (6.5429797, 426.00003, 11.3328), (6.5429797, 426.00003, 11.3328), (6.5429797, 426.00003, 11.3328), (11.3328, 426.00003, 6.543), (11.3328, 426.00003, 6.543), (11.3328, 426.00003, 6.543), (11.3328, 426.00003, 6.543), (11.3328, 426.00003, 6.543), (-0.00000875443, 403.91797, 2.4835302e-7), (-0.00000875443, 403.91797, 2.4835302e-7), (-0.00000875443, 403.91797, 2.4835302e-7), (-0.00000875443, 403.91797, 2.4835302e-7), (-0.00000875443, 403.91797, 2.4835302e-7), (-0.00000875443, 403.91797, 2.4835302e-7), (-0.00000875443, 403.91797, 2.4835302e-7), (-0.00000875443, 403.91797, 2.4835302e-7), (-0.00000875443, 403.91797, 2.4835302e-7), (-0.00000875443, 403.91797, 2.4835302e-7), (-0.00000875443, 403.91797, 2.4835302e-7), (-0.00000875443, 403.91797, 2.4835302e-7), (76.498, 29.910002, 0.00000317423), (76.498, 29.910002, 0.00000317423), (76.498, 29.910002, 0.00000317423), (76.498, 29.910002, 0.00000317423), (76.498, 29.910002, 0.00000317423), (66.1109, 29.910002, -39.536602), (66.1109, 29.910002, -39.536602), (66.1109, 29.910002, -39.536602), (66.1109, 29.910002, -39.536602), (66.1109, 29.910002, -39.536602), (66.1109, 29.910002, -39.536602), (39.536602, 29.910002, -66.1109), (39.536602, 29.910002, -66.1109), (39.536602, 29.910002, -66.1109), (39.536602, 29.910002, -66.1109), (39.536602, 29.910002, -66.1109), (-39.536602, 29.910002, 66.1109), (-39.536602, 29.910002, 66.1109), (-39.536602, 29.910002, 66.1109), (-39.536602, 29.910002, 66.1109), (-39.536602, 29.910002, 66.1109), (-0.0000330479, 29.910002, 76.498), (-0.0000330479, 29.910002, 76.498), (-0.0000330479, 29.910002, 76.498), (-0.0000330479, 29.910002, 76.498), (-0.0000330479, 29.910002, 76.498), (-0.0000330479, 29.910002, 76.498), (39.536602, 29.910002, 66.1109), (39.536602, 29.910002, 66.1109), (39.536602, 29.910002, 66.1109), (39.536602, 29.910002, 66.1109), (39.536602, 29.910002, 66.1109), (66.1109, 29.910002, 39.536602), (66.1109, 29.910002, 39.536602), (66.1109, 29.910002, 39.536602), (66.1109, 29.910002, 39.536602), (66.1109, 29.910002, 39.536602), (66.1109, 29.910002, 39.536602), (-35.2996, 35.6659, -61.140602), (-35.2996, 35.6659, -61.140602), (-35.2996, 35.6659, -61.140602), (-35.2996, 35.6659, -61.140602), (-35.2996, 35.6659, -61.140602), (-35.2996, 35.6659, -61.140602), (-61.140602, 35.6659, -35.2996), (-61.140602, 35.6659, -35.2996), (-61.140602, 35.6659, -35.2996), (-61.140602, 35.6659, -35.2996), (-61.140602, 35.6659, -35.2996), (-61.140602, 35.6659, -35.2996), (-70.599106, 35.6659, -0.00000838732), (-70.599106, 35.6659, -0.00000838732), (-70.599106, 35.6659, -0.00000838732), (-70.599106, 35.6659, -0.00000838732), (-70.599106, 35.6659, -0.00000838732), (-70.599106, 35.6659, -0.00000838732), (-76.498, 29.910002, -0.0000088753195), (-76.498, 29.910002, -0.0000088753195), (-76.498, 29.910002, -0.0000088753195), (-76.498, 29.910002, -0.0000088753195), (-76.498, 29.910002, -0.0000088753195), (-76.498, 29.910002, -0.0000088753195), (-61.140602, 35.6659, 35.2996), (-61.140602, 35.6659, 35.2996), (-61.140602, 35.6659, 35.2996), (-61.140602, 35.6659, 35.2996), (-61.140602, 35.6659, 35.2996), (-61.140602, 35.6659, 35.2996), (70.599106, 35.6659, 0.0000028389), (70.599106, 35.6659, 0.0000028389), (70.599106, 35.6659, 0.0000028389), (70.599106, 35.6659, 0.0000028389), (70.599106, 35.6659, 0.0000028389), (70.599106, 35.6659, 0.0000028389), (61.140602, 35.6659, -35.2996), (61.140602, 35.6659, -35.2996), (61.140602, 35.6659, -35.2996), (61.140602, 35.6659, -35.2996), (61.140602, 35.6659, -35.2996), (61.140602, 35.6659, -35.2996), (35.2996, 35.6659, -61.140602), (35.2996, 35.6659, -61.140602), (35.2996, 35.6659, -61.140602), (35.2996, 35.6659, -61.140602), (35.2996, 35.6659, -61.140602), (35.2996, 35.6659, -61.140602), (-0.0000053236, 35.6659, -70.599106), (-0.0000053236, 35.6659, -70.599106), (-0.0000053236, 35.6659, -70.599106), (-0.0000053236, 35.6659, -70.599106), (-0.0000053236, 35.6659, -70.599106), (-0.0000053236, 35.6659, -70.599106), (-0.00000506183, 29.910002, -76.498), (-0.00000506183, 29.910002, -76.498), (-0.00000506183, 29.910002, -76.498), (-0.00000506183, 29.910002, -76.498), (-0.00000506183, 29.910002, -76.498), (-0.00000506183, 29.910002, -76.498), (-35.2996, 35.6659, 61.140602), (-35.2996, 35.6659, 61.140602), (-35.2996, 35.6659, 61.140602), (-35.2996, 35.6659, 61.140602), (-35.2996, 35.6659, 61.140602), (-35.2996, 35.6659, 61.140602), (-0.0000320017, 35.6659, 70.599106), (-0.0000320017, 35.6659, 70.599106), (-0.0000320017, 35.6659, 70.599106), (-0.0000320017, 35.6659, 70.599106), (-0.0000320017, 35.6659, 70.599106), (-0.0000320017, 35.6659, 70.599106), (35.2995, 35.6659, 61.140602), (35.2995, 35.6659, 61.140602), (35.2995, 35.6659, 61.140602), (35.2995, 35.6659, 61.140602), (35.2995, 35.6659, 61.140602), (35.2995, 35.6659, 61.140602), (61.140602, 35.6659, 35.2996), (61.140602, 35.6659, 35.2996), (61.140602, 35.6659, 35.2996), (61.140602, 35.6659, 35.2996), (61.140602, 35.6659, 35.2996), (61.140602, 35.6659, 35.2996), (16.700201, 428.696, 5.02061e-7), (16.700201, 428.696, 5.02061e-7), (16.700201, 428.696, 5.02061e-7), (16.700201, 428.696, 5.02061e-7), (16.700201, 428.696, 5.02061e-7), (16.700201, 428.696, 5.02061e-7), (14.4628, 428.696, -8.3501005), (14.4628, 428.696, -8.3501005), (14.4628, 428.696, -8.3501005), (14.4628, 428.696, -8.3501005), (14.4628, 428.696, -8.3501005), (14.4628, 428.696, -8.3501005), (8.35009, 428.696, -14.4628), (8.35009, 428.696, -14.4628), (8.35009, 428.696, -14.4628), (8.35009, 428.696, -14.4628), (8.35009, 428.696, -14.4628), (8.35009, 428.696, -14.4628), (-0.00000791631, 428.696, -16.700201), (-0.00000791631, 428.696, -16.700201), (-0.00000791631, 428.696, -16.700201), (-0.00000791631, 428.696, -16.700201), (-0.00000791631, 428.696, -16.700201), (-0.00000791631, 428.696, -16.700201), (-8.35011, 428.696, -14.4628), (-8.35011, 428.696, -14.4628), (-8.35011, 428.696, -14.4628), (-8.35011, 428.696, -14.4628), (-8.35011, 428.696, -14.4628), (-8.35011, 428.696, -14.4628), (-14.4628, 428.696, -8.3501005), (-14.4628, 428.696, -8.3501005), (-14.4628, 428.696, -8.3501005), (-14.4628, 428.696, -8.3501005), (-14.4628, 428.696, -8.3501005), (-14.4628, 428.696, -8.3501005), (-16.700201, 428.696, -0.0000020196), (-16.700201, 428.696, -0.0000020196), (-16.700201, 428.696, -0.0000020196), (-16.700201, 428.696, -0.0000020196), (-16.700201, 428.696, -0.0000020196), (-16.700201, 428.696, -0.0000020196), (-14.4628, 428.696, 8.3501005), (-14.4628, 428.696, 8.3501005), (-14.4628, 428.696, 8.3501005), (-14.4628, 428.696, 8.3501005), (-14.4628, 428.696, 8.3501005), (-14.4628, 428.696, 8.3501005), (-8.35011, 428.696, 14.4628), (-8.35011, 428.696, 14.4628), (-8.35011, 428.696, 14.4628), (-8.35011, 428.696, 14.4628), (-8.35011, 428.696, 14.4628), (-8.35011, 428.696, 14.4628), (-0.0000149504, 428.696, 16.700201), (-0.0000149504, 428.696, 16.700201), (-0.0000149504, 428.696, 16.700201), (-0.0000149504, 428.696, 16.700201), (-0.0000149504, 428.696, 16.700201), (-0.0000149504, 428.696, 16.700201), (8.35009, 428.696, 14.4628), (8.35009, 428.696, 14.4628), (8.35009, 428.696, 14.4628), (8.35009, 428.696, 14.4628), (8.35009, 428.696, 14.4628), (8.35009, 428.696, 14.4628), (14.4628, 428.696, 8.35011), (14.4628, 428.696, 8.35011), (14.4628, 428.696, 8.35011), (14.4628, 428.696, 8.35011), (14.4628, 428.696, 8.35011), (14.4628, 428.696, 8.35011)]
+            float2[] primvars:st = [(0.00186804, 0.14366001), (0.00186804, 0.737824), (0.143758, 0.879714), (0.143758, 0.879714), (0.737922, 0.879714), (0.879812, 0.737824), (0.00186804, 0.14366001), (0.143758, 0.879714), (0.879812, 0.737824), (0.879812, 0.737824), (0.879812, 0.14366001), (0.737922, 0.0017699599), (0.00186804, 0.14366001), (0.879812, 0.737824), (0.737922, 0.0017699599), (0.143758, 0.0017699599), (0.00186804, 0.14366001), (0.737922, 0.0017699599), (0.231565, 0.894771), (0.877705, 0.894771), (0.877705, 0.991131), (0.877705, 0.991131), (0.231565, 0.991131), (0.231565, 0.894771), (0.66077, 0.894771), (0.0146297, 0.894771), (0.0146297, 0.991131), (0.0146297, 0.991131), (0.66077, 0.991131), (0.66077, 0.894771), (0.231565, 0.894771), (0.877705, 0.894771), (0.877705, 0.991131), (0.877705, 0.991131), (0.231565, 0.991131), (0.231565, 0.894771), (0.66077, 0.894771), (0.0146297, 0.894771), (0.0146297, 0.991131), (0.0146297, 0.991131), (0.66077, 0.991131), (0.66077, 0.894771), (0.877705, 0.894771), (0.66077, 0.894771), (0.66077, 0.991131), (0.66077, 0.991131), (0.877705, 0.991131), (0.877705, 0.894771), (0.66077, 0.991131), (0.877705, 0.991131), (0.877705, 0.894771), (0.877705, 0.894771), (0.66077, 0.894771), (0.66077, 0.991131), (0.0146296, 0.894771), (0.231565, 0.894771), (0.231565, 0.991131), (0.231565, 0.991131), (0.0146296, 0.991131), (0.0146296, 0.894771), (0.0146296, 0.894771), (0.231565, 0.894771), (0.231565, 0.991131), (0.231565, 0.991131), (0.0146296, 0.991131), (0.0146296, 0.894771), (0.151105, 0.019506216), (0.143758, 0.0017699599), (0.737922, 0.0017699599), (0.737922, 0.0017699599), (0.730576, 0.019506216), (0.151105, 0.019506216), (0.862076, 0.151007), (0.879812, 0.14366001), (0.879812, 0.737824), (0.879812, 0.737824), (0.862076, 0.730478), (0.862076, 0.151007), (0.730576, 0.861978), (0.737922, 0.879714), (0.143758, 0.879714), (0.143758, 0.879714), (0.151105, 0.861978), (0.730576, 0.861978), (0.0196044, 0.730478), (0.00186804, 0.737824), (0.00186804, 0.14366001), (0.00186804, 0.14366001), (0.0196044, 0.151007), (0.0196044, 0.730478), (0.143758, 0.0017699599), (0.151105, 0.019506216), (0.0196044, 0.151007), (0.0196044, 0.151007), (0.00186804, 0.14366001), (0.143758, 0.0017699599), (0.879812, 0.14366001), (0.862076, 0.151007), (0.730576, 0.019506216), (0.730576, 0.019506216), (0.737922, 0.0017699599), (0.879812, 0.14366001), (0.00186804, 0.737824), (0.0196044, 0.730478), (0.151105, 0.861978), (0.151105, 0.861978), (0.143758, 0.879714), (0.00186804, 0.737824), (0.737922, 0.879714), (0.730576, 0.861978), (0.862076, 0.730478), (0.862076, 0.730478), (0.879812, 0.737824), (0.737922, 0.879714), (0.44084, 0.101544976), (0.151105, 0.019506216), (0.730576, 0.019506216), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.916826, 0.861988), (0.906368, 0.855955), (0.912436, 0.833282), (0.912436, 0.833282), (0.92451, 0.833282), (0.916826, 0.861988), (0.895822, 0.883013), (0.889782, 0.87256), (0.906368, 0.855955), (0.906368, 0.855955), (0.916826, 0.861988), (0.895822, 0.883013), (0.867115, 0.890712), (0.867115, 0.87864), (0.889782, 0.87256), (0.889782, 0.87256), (0.895822, 0.883013), (0.867115, 0.890712), (0.838408, 0.883013), (0.844447, 0.87256), (0.867115, 0.87864), (0.867115, 0.87864), (0.867115, 0.890712), (0.838408, 0.883013), (0.817403, 0.861988), (0.827861, 0.855955), (0.844447, 0.87256), (0.844447, 0.87256), (0.838408, 0.883013), (0.817403, 0.861988), (0.80972, 0.833282), (0.821794, 0.833282), (0.827861, 0.855955), (0.827861, 0.855955), (0.817403, 0.861988), (0.80972, 0.833282), (0.817404, 0.804575), (0.827861, 0.810608), (0.821794, 0.833282), (0.821794, 0.833282), (0.80972, 0.833282), (0.817404, 0.804575), (0.838408, 0.78355), (0.844447, 0.794003), (0.827861, 0.810608), (0.827861, 0.810608), (0.817404, 0.804575), (0.838408, 0.78355), (0.867115, 0.775851), (0.867115, 0.787923), (0.844447, 0.794003), (0.844447, 0.794003), (0.838408, 0.78355), (0.867115, 0.775851), (0.895822, 0.783549), (0.889782, 0.794003), (0.867115, 0.787923), (0.867115, 0.787923), (0.867115, 0.775851), (0.895822, 0.783549), (0.916826, 0.804575), (0.906369, 0.810608), (0.889782, 0.794003), (0.889782, 0.794003), (0.895822, 0.783549), (0.916826, 0.804575), (0.92451, 0.833282), (0.912436, 0.833282), (0.906369, 0.810608), (0.906369, 0.810608), (0.916826, 0.804575), (0.92451, 0.833282), (0.10907, 0.87242), (0.0926293, 0.880136), (0.0718681, 0.81453), (0.0926293, 0.880136), (0.0747421, 0.883284), (0.0718681, 0.81453), (0.0747421, 0.883284), (0.0566536, 0.881642), (0.0718681, 0.81453), (0.0566536, 0.881642), (0.0396239, 0.875323), (0.0718681, 0.81453), (0.0396239, 0.875323), (0.0248401, 0.864767), (0.0718681, 0.81453), (0.0248401, 0.864767), (0.0133326, 0.850708), (0.0718681, 0.81453), (0.0133326, 0.850708), (0.00590477, 0.83413), (0.0718681, 0.81453), (0.00590477, 0.83413), (0.00307388, 0.816187), (0.0718681, 0.81453), (0.00307388, 0.816187), (0.00503601, 0.798131), (0.0718681, 0.81453), (0.00503601, 0.798131), (0.0116534, 0.781219), (0.0718681, 0.81453), (0.0116534, 0.781219), (0.0224642, 0.766627), (0.0718681, 0.81453), (0.122919, 0.860671), (0.10907, 0.87242), (0.0718681, 0.81453), (0.95882, 0.995241), (0.932891, 0.995241), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.990911, 0.025349617), (0.95882, 0.995241), (0.780037, 0.44074202), (0.73398, 0.26543403), (0.862076, 0.151007), (0.862076, 0.730478), (0.73398, 0.61605), (0.780037, 0.44074202), (0.780037, 0.44074202), (0.862076, 0.151007), (0.862076, 0.730478), (0.730576, 0.019506216), (0.616148, 0.14760202), (0.44084, 0.101544976), (0.101643, 0.44074202), (0.0196044, 0.730478), (0.0196044, 0.151007), (0.730576, 0.019506216), (0.862076, 0.151007), (0.73398, 0.26543403), (0.73398, 0.26543403), (0.616148, 0.14760202), (0.730576, 0.019506216), (0.151105, 0.019506216), (0.44084, 0.101544976), (0.265532, 0.14760202), (0.265532, 0.14760202), (0.1477, 0.26543403), (0.0196044, 0.151007), (0.0196044, 0.151007), (0.151105, 0.019506216), (0.265532, 0.14760202), (0.0196044, 0.151007), (0.1477, 0.26543403), (0.101643, 0.44074202), (0.44084, 0.779939), (0.730576, 0.861978), (0.151105, 0.861978), (0.0196044, 0.730478), (0.101643, 0.44074202), (0.1477, 0.61605), (0.1477, 0.61605), (0.265532, 0.733882), (0.151105, 0.861978), (0.151105, 0.861978), (0.0196044, 0.730478), (0.1477, 0.61605), (0.151105, 0.861978), (0.265532, 0.733882), (0.44084, 0.779939), (0.73398, 0.61605), (0.862076, 0.730478), (0.730576, 0.861978), (0.730576, 0.861978), (0.616148, 0.733882), (0.73398, 0.61605), (0.730576, 0.861978), (0.44084, 0.779939), (0.616148, 0.733882), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.900801, 0.025349498), (0.896899, 0.004677534), (0.994813, 0.0046774745), (0.994813, 0.0046774745), (0.990911, 0.025349617), (0.900801, 0.025349498), (0.89591, 0.849922), (0.900362, 0.833282), (0.912436, 0.833282), (0.912436, 0.833282), (0.906368, 0.855955), (0.89591, 0.849922), (0.883742, 0.862107), (0.89591, 0.849922), (0.906368, 0.855955), (0.906368, 0.855955), (0.889782, 0.87256), (0.883742, 0.862107), (0.867115, 0.866568), (0.883742, 0.862107), (0.889782, 0.87256), (0.889782, 0.87256), (0.867115, 0.87864), (0.867115, 0.866568), (0.850487, 0.862106), (0.867115, 0.866568), (0.867115, 0.87864), (0.867115, 0.87864), (0.844447, 0.87256), (0.850487, 0.862106), (0.838319, 0.849922), (0.850487, 0.862106), (0.844447, 0.87256), (0.844447, 0.87256), (0.827861, 0.855955), (0.838319, 0.849922), (0.833867, 0.833282), (0.838319, 0.849922), (0.827861, 0.855955), (0.827861, 0.855955), (0.821794, 0.833282), (0.833867, 0.833282), (0.838319, 0.816641), (0.833867, 0.833282), (0.821794, 0.833282), (0.821794, 0.833282), (0.827861, 0.810608), (0.838319, 0.816641), (0.850487, 0.804456), (0.838319, 0.816641), (0.827861, 0.810608), (0.827861, 0.810608), (0.844447, 0.794003), (0.850487, 0.804456), (0.867115, 0.799995), (0.850487, 0.804456), (0.844447, 0.794003), (0.844447, 0.794003), (0.867115, 0.787923), (0.867115, 0.799995), (0.883743, 0.804456), (0.867115, 0.799995), (0.867115, 0.787923), (0.867115, 0.787923), (0.889782, 0.794003), (0.883743, 0.804456), (0.895911, 0.816641), (0.883743, 0.804456), (0.889782, 0.794003), (0.889782, 0.794003), (0.906369, 0.810608), (0.895911, 0.816641), (0.900362, 0.833282), (0.895911, 0.816641), (0.906369, 0.810608), (0.906369, 0.810608), (0.912436, 0.833282), (0.900362, 0.833282)] (
+                interpolation = "faceVarying"
+            )
+            uniform token subdivisionScheme = "none"
+        }
+    }
+
+    def Mesh "Wall1" (
+        apiSchemas = ["PhysicsCollisionAPI", "PhysxCollisionAPI", "PhysxTriangleMeshCollisionAPI", "PhysicsMeshCollisionAPI"]
+    )
+    {
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 3, 2, 0, 4, 5, 1, 1, 5, 6, 3, 2, 3, 6, 7, 0, 2, 7, 4, 4, 7, 6, 5]
+        rel material:binding = </scene/Looks/Oak> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        normal3f[] normals = [(0, -1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token physics:approximation = "none"
+        bool physics:collisionEnabled = 1
+        point3f[] points = [(-50, -50, -50), (50, -50, -50), (-50, -50, 50), (50, -50, 50), (-50, 50, -50), (50, 50, -50), (50, 50, 50), (-50, 50, 50)]
+        float2[] primvars:st = [(1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token subdivisionScheme = "none"
+        quatd xformOp:orient = (6.123233995736766e-17, 0, 0, 1)
+        double3 xformOp:scale = (0.06, 0.0015, 0.025)
+        double3 xformOp:translate = (0.024326, 3.925, 1.25)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Mesh "Wall3" (
+        apiSchemas = ["PhysicsCollisionAPI", "PhysxCollisionAPI", "PhysxTriangleMeshCollisionAPI", "PhysicsMeshCollisionAPI"]
+    )
+    {
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 3, 2, 0, 4, 5, 1, 1, 5, 6, 3, 2, 3, 6, 7, 0, 2, 7, 4, 4, 7, 6, 5]
+        rel material:binding = </scene/Looks/Oak> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        normal3f[] normals = [(0, -1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token physics:approximation = "none"
+        bool physics:collisionEnabled = 1
+        point3f[] points = [(-50, -50, -50), (50, -50, -50), (-50, -50, 50), (50, -50, 50), (-50, 50, -50), (50, 50, -50), (50, 50, 50), (-50, 50, 50)]
+        float2[] primvars:st = [(1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token subdivisionScheme = "none"
+        quatd xformOp:orient = (0.7071067811865476, 0, 0, 0.7071067811865475)
+        double3 xformOp:scale = (0.08, 0.001500000013038516, 0.02500000037252903)
+        double3 xformOp:translate = (2.94933, 0, 1.2499999999999998)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Mesh "Wall2" (
+        apiSchemas = ["PhysicsCollisionAPI", "PhysxCollisionAPI", "PhysxTriangleMeshCollisionAPI", "PhysicsMeshCollisionAPI"]
+    )
+    {
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 3, 2, 0, 4, 5, 1, 1, 5, 6, 3, 2, 3, 6, 7, 0, 2, 7, 4, 4, 7, 6, 5]
+        rel material:binding = </scene/Looks/Oak> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        normal3f[] normals = [(0, -1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token physics:approximation = "none"
+        bool physics:collisionEnabled = 1
+        point3f[] points = [(-50, -50, -50), (50, -50, -50), (-50, -50, 50), (50, -50, 50), (-50, 50, -50), (50, 50, -50), (50, 50, 50), (-50, 50, 50)]
+        float2[] primvars:st = [(1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token subdivisionScheme = "none"
+        quatd xformOp:orient = (1, 0, 0, 0)
+        double3 xformOp:scale = (0.06, 0.001500000013038516, 0.02500000037252903)
+        double3 xformOp:translate = (0.024326, -3.925, 1.2499999999999998)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Mesh "Wall4" (
+        apiSchemas = ["PhysicsCollisionAPI", "PhysxCollisionAPI", "PhysxTriangleMeshCollisionAPI", "PhysicsMeshCollisionAPI"]
+    )
+    {
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 3, 2, 0, 4, 5, 1, 1, 5, 6, 3, 2, 3, 6, 7, 0, 2, 7, 4, 4, 7, 6, 5]
+        rel material:binding = </scene/Looks/Oak> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        normal3f[] normals = [(0, -1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token physics:approximation = "none"
+        bool physics:collisionEnabled = 1
+        point3f[] points = [(-50, -50, -50), (50, -50, -50), (-50, -50, 50), (50, -50, 50), (-50, 50, -50), (50, 50, -50), (50, 50, 50), (-50, 50, 50)]
+        float2[] primvars:st = [(1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token subdivisionScheme = "none"
+        quatd xformOp:orient = (0.7071067811865476, 0, 0, 0.7071067811865475)
+        double3 xformOp:scale = (0.08, 0.001500000013038516, 0.02500000037252903)
+        double3 xformOp:translate = (-2.90067, 0, 1.2499999999999998)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Mesh "Wall5" (
+        apiSchemas = ["PhysicsCollisionAPI", "PhysxCollisionAPI", "PhysxTriangleMeshCollisionAPI", "PhysicsMeshCollisionAPI"]
+    )
+    {
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 3, 2, 0, 4, 5, 1, 1, 5, 6, 3, 2, 3, 6, 7, 0, 2, 7, 4, 4, 7, 6, 5]
+        rel material:binding = </scene/Looks/material_DefaultMaterial> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        normal3f[] normals = [(0, -1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token physics:approximation = "none"
+        bool physics:collisionEnabled = 1
+        point3f[] points = [(-50, -50, -50), (50, -50, -50), (-50, -50, 50), (50, -50, 50), (-50, 50, -50), (50, 50, -50), (50, 50, 50), (-50, 50, 50)]
+        float2[] primvars:st = [(1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token subdivisionScheme = "none"
+        quatd xformOp:orient = (6.123233995736766e-17, 0, 0, 1)
+        double3 xformOp:scale = (0.02, 0.001500000013038516, 0.0249)
+        double3 xformOp:translate = (-1.92936, -0.04, 1.2499999999999998)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Mesh "Wall6" (
+        apiSchemas = ["PhysicsCollisionAPI", "PhysxCollisionAPI", "PhysxTriangleMeshCollisionAPI", "PhysicsMeshCollisionAPI"]
+    )
+    {
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 3, 2, 0, 4, 5, 1, 1, 5, 6, 3, 2, 3, 6, 7, 0, 2, 7, 4, 4, 7, 6, 5]
+        rel material:binding = </scene/Looks/material_DefaultMaterial> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        normal3f[] normals = [(0, -1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0), (0, 0, -1), (0, 0, -1), (0, 0, -1), (0, 0, -1), (1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0), (0, 1, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token physics:approximation = "none"
+        bool physics:collisionEnabled = 1
+        point3f[] points = [(-50, -50, -50), (50, -50, -50), (-50, -50, 50), (50, -50, 50), (-50, 50, -50), (50, 50, -50), (50, 50, 50), (-50, 50, 50)]
+        float2[] primvars:st = [(1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (0, 0), (0, 1), (1, 1), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0)] (
+            interpolation = "faceVarying"
+        )
+        uniform token subdivisionScheme = "none"
+        quatd xformOp:orient = (6.123233995736766e-17, 0, 0, 1)
+        double3 xformOp:scale = (0.02, 0.001500000013038516, 0.0249)
+        double3 xformOp:translate = (1.9236, -0.04, 1.2499999999999998)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+}
+
+def Camera "OmniverseKit_Persp" (
+    hide_in_stage_window = true
+    kind = "component"
+    no_delete = true
+)
+{
+    float4[] clippingPlanes = []
+    float2 clippingRange = (1, 10000000)
+    float focalLength = 18.147562
+    float focusDistance = 0
+    float fStop = 0
+    float horizontalAperture = 20.955
+    float horizontalApertureOffset = 0
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -8.660254037844387)
+    token projection = "perspective"
+    float verticalAperture = 15.2908
+    float verticalApertureOffset = 0
+    quatd xformOp:orient = (0.3398511429799871, 0.17591989660616103, 0.42470820027786677, 0.8204732385702835)
+    double3 xformOp:scale = (1.0000000000000016, 1.0000000000000009, 0.9999999999999999)
+    double3 xformOp:translate = (4.999999999999999, 5, 5.0000000000000036)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+}
+
+def Camera "OmniverseKit_Front" (
+    hide_in_stage_window = true
+    kind = "component"
+    no_delete = true
+)
+{
+    float4[] clippingPlanes = []
+    float2 clippingRange = (20000, 10000000)
+    float focalLength = 50
+    float focusDistance = 0
+    float fStop = 0
+    float horizontalAperture = 5000
+    float horizontalApertureOffset = 0
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -50000.000000000015)
+    token projection = "orthographic"
+    float verticalAperture = 3648.4849
+    float verticalApertureOffset = 0
+    quatd xformOp:orient = (0.49999999999999994, 0.5, 0.5000000000000001, 0.5000000000000001)
+    double3 xformOp:scale = (1.0000000000000002, 1, 1.0000000000000002)
+    double3 xformOp:translate = (50000.00000000003, -2.2204460492503134e-11, 0)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+}
+
+def Camera "OmniverseKit_Top" (
+    hide_in_stage_window = true
+    kind = "component"
+    no_delete = true
+)
+{
+    float4[] clippingPlanes = []
+    float2 clippingRange = (20000, 10000000)
+    float focalLength = 50
+    float focusDistance = 0
+    float fStop = 0
+    float horizontalAperture = 5000
+    float horizontalApertureOffset = 0
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -50000)
+    token projection = "orthographic"
+    float verticalAperture = 3648.4849
+    float verticalApertureOffset = 0
+    quatd xformOp:orient = (-0.7071067811865475, 0, 0, 0.7071067811865476)
+    double3 xformOp:scale = (1, 1, 1)
+    double3 xformOp:translate = (0, 0, 50000)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+}
+
+def Camera "OmniverseKit_Right" (
+    hide_in_stage_window = true
+    kind = "component"
+    no_delete = true
+)
+{
+    float4[] clippingPlanes = []
+    float2 clippingRange = (20000, 10000000)
+    float focalLength = 50
+    float focusDistance = 0
+    float fStop = 0
+    float horizontalAperture = 5000
+    float horizontalApertureOffset = 0
+    custom uniform vector3d omni:kit:centerOfInterest = (0, 0, -50000)
+    token projection = "orthographic"
+    float verticalAperture = 3648.4849
+    float verticalApertureOffset = 0
+    quatd xformOp:orient = (0.7071067811865475, 0.7071067811865476, 0, 0)
+    double3 xformOp:scale = (1, 1, 1)
+    double3 xformOp:translate = (0, -50000, -2.220446049250313e-11)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+}
+
+def "Render" (
+    hide_in_stage_window = true
+    no_delete = true
+)
+{
+    def RenderProduct "RenderProduct_Viewport" (
+        hide_in_stage_window = true
+        no_delete = true
+    )
+    {
+        rel camera = </OmniverseKit_Persp>
+        custom double farPlaneOverride = 0
+        custom double nearPlaneOverride = 0
+        rel orderedVars = </Render/Vars/LdrColor>
+        custom bool overrideClipRange = 0
+        uniform int2 resolution = (1280, 720)
+        custom uint64 viewPickingId = 706156877477137
+        custom int viewportHandle = 0
+    }
+
+    def "Vars"
+    {
+        def RenderVar "LdrColor" (
+            hide_in_stage_window = true
+            no_delete = true
+        )
+        {
+            uniform string sourceName = "LdrColor"
+        }
+    }
+}
+

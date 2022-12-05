@@ -1,0 +1,17 @@
+# File produced by Open Asset Import Library (http://www.assimp.sf.net)
+# (assimp v5.0.1937526254)
+
+newmtl material_Oak
+Kd 1 1 1
+illum 1
+bump ./materials/textures/Oak_N.png
+map_bump ./materials/textures/Oak_N.png
+
+newmtl material_material_DefaultMaterial
+Kd 1 1 1
+illum 1
+
+newmtl material_Shape_001
+Kd 1 1 1
+illum 1
+
