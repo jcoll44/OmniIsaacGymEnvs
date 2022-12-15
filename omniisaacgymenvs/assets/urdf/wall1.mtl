@@ -1,0 +1,24 @@
+# File produced by Open Asset Import Library (http://www.assimp.sf.net)
+# (assimp v5.0.1937526254)
+
+newmtl OmniPBR
+Kd 1 1 1
+illum 1
+
+newmtl Oak
+Kd 1 1 1
+illum 1
+map_Kd ./materials/textures/Oak_BaseColor.png
+bump ./materials/textures/Oak_N.png
+map_bump ./materials/textures/Oak_N.png
+
+newmtl material_DefaultMaterial
+Kd 1 1 1
+illum 1
+
+newmtl Shape_001
+Ke 0 0 0
+illum 1
+map_Kd ./materials/textures/Construction_Cone_Diffuse.png
+map_d ./materials/textures/Construction_Cone_Diffuse.png
+

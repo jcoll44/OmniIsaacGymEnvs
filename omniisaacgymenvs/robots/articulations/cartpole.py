@@ -41,7 +41,7 @@ class Cartpole(Robot):
         self,
         prim_path: str,
         name: Optional[str] = "Cartpole",
-        usd_path: Optional[str] = None,
+        usd_path: Optional[str] = "/home/jcollins/Documents/Projects/Metacognition/OmniIsaacGymEnvs/omniisaacgymenvs/assets/jackal/jackal.usd",
         translation: Optional[np.ndarray] = None,
         orientation: Optional[np.ndarray] = None,
     ) -> None:
