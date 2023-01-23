@@ -181,9 +181,9 @@ def parse_hydra_configs(cfg: DictConfig):
     agent.has_batch_dimension = True
 
     #for confidence estimate
-    experience = Experience(prior_alpha = 0.0, prior_beta=0.0, length_scale=10.0, num_env = cfg.num_envs)
+    experience = Experience(prior_alpha = 0.0, prior_beta=0.0, length_scale=0.7, num_env = cfg.num_envs)
 
-    while env._simulation_app.is_running() and env.sim_frame_count<500:
+    while env._simulation_app.is_running() and env.sim_frame_count<1000:
         if env._world.is_playing():
             if env._world.current_time_step_index == 0:
                 obs = env._world.reset(soft=True)
@@ -206,13 +206,14 @@ def parse_hydra_configs(cfg: DictConfig):
     # -1.5, 1.5
     # -0.3, 0.2
 
-    x_init_space = np.linspace(-1.5,1.5, 20)
-    y_init_space = np.linspace(-2.3,1.8, 20)
+    print(len(experience.successful_states))
+    x_init_space = np.linspace(-1.5,1.5, 10)
+    y_init_space = np.linspace(-2.3,1.8, 10)
     X, Y = np.meshgrid(x_init_space, y_init_space)
     Z = np.zeros_like(X)
     for i,x in enumerate(x_init_space):
         for j,y in enumerate(y_init_space):
-            state = np.array([x,y, 0.065, 0.0007963 , 0, 0, 0.9999997, -1.2, 1.5])
+            state = np.array([x,y, 0.0635, 0.70711 , 0., 0., 0.70711, -1.2, 1.5])
             Z[i,j], sigma, alpha, beta = experience.get_state_value(state)
     # print(value, sigma, alpha, beta)
 

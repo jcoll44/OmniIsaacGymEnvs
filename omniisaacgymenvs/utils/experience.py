@@ -36,6 +36,7 @@ class Experience(object):
 
         for episode in self.successful_states:
         	for old_state in episode:
+
         		state_delta = old_state - state
 
         		weight = np.exp(-1.0*(np.linalg.norm(state_delta/length_scale))**2)
