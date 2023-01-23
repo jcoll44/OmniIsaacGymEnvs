@@ -47,7 +47,7 @@ import torch
 import math
 
 
-class JackalTask(RLTask):
+class JackalVisionTask(RLTask):
     def __init__(
         self,
         name,
@@ -68,15 +68,8 @@ class JackalTask(RLTask):
         self._max_velocity = 20.0
         self._max_episode_length = self._task_cfg["env"]["maxEpisodeLength"]
 
-        self._dt = self._task_cfg["sim"]["dt"]
-
         self._num_observations = 9
         self._num_actions = 2
-
-        self._noise_choices  = [0.0, 0.07, 0.1]
-        self._noise_level = torch.zeros([self._num_envs], dtype=torch.int32)
-        self._action_array = torch.zeros([self._num_envs, 2, int(self._noise_choices[-1]/self._dt)], dtype=torch.float64)
-
         
 
         RLTask.__init__(self, name, env)
@@ -197,15 +190,8 @@ class JackalTask(RLTask):
         # Add action conditional later
         velocity = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
 
-        self._action_array[:,:,0] = torch.where(self._noise_level == 0, actions, self._action_array[:,:,0])
-        self._action_array[:,:,int(self._noise_choices[1]/self._dt)] = torch.where(self._noise_level == 1, actions, self._action_array[:,:,int(self._noise_choices[1]/self._dt)])
-        self._action_array[:,:,-1] = torch.where(self._noise_level == 2, actions, self._action_array[:,:,-1])
-
-
-        velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0]*2,self._action_array[:,1,0]*30)
-        velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0]*2,self._action_array[:,1,0]*30)
-
-
+        velocity[:,0],velocity[:,1] = self.wheel_velocities(actions[:,0]*2,actions[:,1]*30)
+        velocity[:,2],velocity[:,3] = self.wheel_velocities(actions[:,0]*2,actions[:,1]*30)
         
 
 
@@ -214,10 +200,6 @@ class JackalTask(RLTask):
 
         indices = torch.arange(self._jackals.count, dtype=torch.int32, device=self._device)
         self._jackals.set_joint_velocity_targets(velocity, indices=indices)
-
-        self._action_array[:,:,0:-1] = self._action_array[:,:,1:]
-
-
 
     def reset_idx(self, env_ids):
         num_resets = len(env_ids)
@@ -245,18 +227,6 @@ class JackalTask(RLTask):
         # root_pos[env_ids, 2] += 0.01
 
         self._right_door.set_world_poses(root_pos[env_ids], self.initial_root_rot[env_ids].clone(), indices=env_ids)
-
-
-        print(env_ids)
-        print(self._noise_level)
-        # Add *sleep* between actions - the easiest option will be have an action offset I think
-        choice = torch.randint(0, len(self._noise_choices), (num_resets,), device=self._device)
-        self._noise_level[env_ids] = choice
-        print(self._noise_level)
-
-        action_array = torch.zeros([self._num_envs, 2, int(self._noise_choices/self._dt)], dtype=torch.float64)
-        self._action_array[env_ids,:,:,:] = action_array[env_ids,:,:,:]
-
 
         # bookkeeping
         self.reset_buf[env_ids] = 0

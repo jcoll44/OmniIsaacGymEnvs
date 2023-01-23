@@ -29,6 +29,7 @@
 
 def initialize_task(config, env, init_sim=True):
     from omniisaacgymenvs.tasks.jackal import JackalTask
+    from omniisaacgymenvs.tasks.jackal_vision import JackalVisionTask
     from omniisaacgymenvs.tasks.allegro_hand import AllegroHandTask
     from omniisaacgymenvs.tasks.ant import AntLocomotionTask
     from omniisaacgymenvs.tasks.anymal import AnymalTask
@@ -45,6 +46,7 @@ def initialize_task(config, env, init_sim=True):
     # Mappings from strings to environments
     task_map = {
         "Jackal": JackalTask,
+        "JackalVision": JackalVisionTask,
         "AllegroHand": AllegroHandTask,
         "Ant": AntLocomotionTask,
         "Anymal": AnymalTask,
