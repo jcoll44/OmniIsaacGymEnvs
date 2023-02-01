@@ -63,7 +63,7 @@ class JackalTask(RLTask):
         self._num_envs = self._task_cfg["env"]["numEnvs"]
         self._env_spacing = self._task_cfg["env"]["envSpacing"]
 
-        self._reset_dist = self._task_cfg["env"]["resetDist"]
+        # self._reset_dist = self._task_cfg["env"]["resetDist"]
         self._max_push_effort = self._task_cfg["env"]["maxEffort"]
         self._max_velocity = 20.0
         self._max_episode_length = self._task_cfg["env"]["maxEpisodeLength"]
@@ -73,11 +73,7 @@ class JackalTask(RLTask):
         self._num_observations = 9
         self._num_actions = 2
 
-        self._noise_choices  = [0.0, 0.07, 0.1]
-        self._noise_level = torch.zeros([self._num_envs], dtype=torch.int32)
-        self._action_array = torch.zeros([self._num_envs, 2, int(self._noise_choices[-1]/self._dt)], dtype=torch.float64)
 
-        
 
         RLTask.__init__(self, name, env)
 
@@ -85,6 +81,11 @@ class JackalTask(RLTask):
         self.y_unit_tensor = torch.tensor([0, 1, 0], dtype=torch.float, device=self.device).repeat((self.num_envs, 1))
         self.z_unit_tensor = torch.tensor([0, 0, 1], dtype=torch.float, device=self.device).repeat((self.num_envs, 1))
         self.target_position = torch.tensor([0.5, 2.0, 0], device=self.device)
+
+        self._noise_choices  = [0.0, 0.07, 0.1]
+        self._noise_level = torch.zeros([self._num_envs], dtype=torch.int64, device=self.device)
+        self._action_array = torch.zeros([self._num_envs, int(self._noise_choices[-1]/self._dt), 2], dtype=torch.float , device=self.device)
+
 
         return
 
@@ -133,7 +134,7 @@ class JackalTask(RLTask):
                 prim_path=self.default_zero_env_path + "/left_door", # The prim path of the cube in the USD stage
                 name="left_door", # The unique name used to retrieve the object from the scene later on
                 position=np.array([-1.0, 0.3, 1.105]), # Using the current stage units which is in meters by default.
-                scale=np.array([20.0, 10.0, 44.0]), # most arguments accept mainly numpy arrays.
+                scale=np.array([1.0, 0.5, 2.2]), # most arguments accept mainly numpy arrays.
                 color=np.array([1.0, 1.0, 1.0]), # RGB channels, going from 0-1
                 mass=1000
             )
@@ -142,7 +143,7 @@ class JackalTask(RLTask):
                 prim_path=self.default_zero_env_path + "/right_door", # The prim path of the cube in the USD stage
                 name="right_door", # The unique name used to retrieve the object from the scene later on
                 position=np.array([1.0, 0.3, 1.105]), # Using the current stage units which is in meters by default.
-                scale=np.array([20.0, 10.0, 44.0]), # most arguments accept mainly numpy arrays.
+                scale=np.array([1.0, 0.5, 2.2]), # most arguments accept mainly numpy arrays.
                 color=np.array([1.0, 1.0, 1.0]), # RGB channels, going from 0-1
                 mass=1000
             )
@@ -177,6 +178,9 @@ class JackalTask(RLTask):
         self.obs_buf[..., 7] = self.root_right_pos[:,0]
         self.obs_buf[..., 8] = self.root_left_pos[:,0]
 
+        # torch.set_printoptions(threshold=10_000)
+        # print(self.obs_buf) # prints the whole tensor
+
         observations = {
             self._jackals.name: {
                 "obs_buf": self.obs_buf
@@ -191,22 +195,27 @@ class JackalTask(RLTask):
             self.reset_idx(reset_env_ids)
 
         actions = actions.to(self._device)
-        torch.where(actions > 1.0, (actions-1)*-1, actions)
+        actions = torch.where(actions > 1.0, (actions-1)*-1, actions)
         # actions = actions - 1
         # actions = actions.repeat(1, 2)
         # Add action conditional later
         velocity = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
 
-        self._action_array[:,:,0] = torch.where(self._noise_level == 0, actions, self._action_array[:,:,0])
-        self._action_array[:,:,int(self._noise_choices[1]/self._dt)] = torch.where(self._noise_level == 1, actions, self._action_array[:,:,int(self._noise_choices[1]/self._dt)])
-        self._action_array[:,:,-1] = torch.where(self._noise_level == 2, actions, self._action_array[:,:,-1])
+
+        self._action_array[:,0,0] = torch.where(self._noise_level == 0, actions[:,0], self._action_array[:,0,0])
+        self._action_array[:,0,1] = torch.where(self._noise_level == 0, actions[:,1], self._action_array[:,0,1])
+        self._action_array[:,int(self._noise_choices[1]/self._dt),0] = torch.where(self._noise_level == 1, actions[:,0], self._action_array[:,int(self._noise_choices[1]/self._dt),0])
+        self._action_array[:,int(self._noise_choices[1]/self._dt),1] = torch.where(self._noise_level == 1, actions[:,1], self._action_array[:,int(self._noise_choices[1]/self._dt),1])
+        self._action_array[:,-1,0] = torch.where(self._noise_level == 2, actions[:,0], self._action_array[:,-1,0])
+        self._action_array[:,-1,1] = torch.where(self._noise_level == 2, actions[:,1], self._action_array[:,-1,1])
 
 
-        velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0]*2,self._action_array[:,1,0]*30)
-        velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0]*2,self._action_array[:,1,0]*30)
+        velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0]*2,self._action_array[:,0,1]*30)
+        velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0]*2,self._action_array[:,0,1]*30)
 
 
-        
+        # velocity[:,0],velocity[:,1] = self.wheel_velocities(actions[:,0]*2,actions[:,1]*30)
+        # velocity[:,2],velocity[:,3] = self.wheel_velocities(actions[:,0]*2,actions[:,1]*30)
 
 
         # forces = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
@@ -215,7 +224,7 @@ class JackalTask(RLTask):
         indices = torch.arange(self._jackals.count, dtype=torch.int32, device=self._device)
         self._jackals.set_joint_velocity_targets(velocity, indices=indices)
 
-        self._action_array[:,:,0:-1] = self._action_array[:,:,1:]
+        self._action_array[:,0:-1,:] = self._action_array[:,1:,:]
 
 
 
@@ -247,15 +256,15 @@ class JackalTask(RLTask):
         self._right_door.set_world_poses(root_pos[env_ids], self.initial_root_rot[env_ids].clone(), indices=env_ids)
 
 
-        print(env_ids)
-        print(self._noise_level)
+        # print(env_ids)
+        # print(self._noise_level)
         # Add *sleep* between actions - the easiest option will be have an action offset I think
         choice = torch.randint(0, len(self._noise_choices), (num_resets,), device=self._device)
         self._noise_level[env_ids] = choice
-        print(self._noise_level)
+        # print(self._noise_level)
 
-        action_array = torch.zeros([self._num_envs, 2, int(self._noise_choices/self._dt)], dtype=torch.float64)
-        self._action_array[env_ids,:,:,:] = action_array[env_ids,:,:,:]
+        action_array = torch.zeros([self._num_envs, int(self._noise_choices[-1]/self._dt), 2], dtype=torch.float, device=self._device )
+        self._action_array[env_ids,:,:] = action_array[env_ids,:,:]
 
 
         # bookkeeping

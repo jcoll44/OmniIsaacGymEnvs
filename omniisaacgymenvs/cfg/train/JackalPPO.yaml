@@ -41,17 +41,19 @@ params:
     device_name: ${....rl_device}
     env_name: rlgpu
     ppo: True
-    mixed_precision: False
+    mixed_precision: True
     normalize_input: True
     normalize_value: True
+    value_bootstrap: True
     num_actors: ${....task.env.numEnvs}
     reward_shaper:
-      scale_value: 0.1
+      scale_value: 0.01
     normalize_advantage: True
     gamma: 0.99
     tau: 0.95
-    learning_rate: 2.5e-4
+    learning_rate: 3e-4
     lr_schedule: adaptive
+    schedule_type: legacy
     kl_threshold: 0.008
     score_to_win: 20000
     max_epochs: ${resolve_default:10000,${....max_iterations}}
@@ -63,8 +65,8 @@ params:
     e_clip: 0.2
     horizon_length: 16
     minibatch_size: 32768
-    mini_epochs: 8
-    critic_coef: 4
+    mini_epochs: 4
+    critic_coef: 2
     clip_value: True
     seq_len: 4
     bounds_loss_coef: 0.0001

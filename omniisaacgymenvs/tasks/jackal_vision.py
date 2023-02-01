@@ -35,7 +35,14 @@ from omni.isaac.core.articulations import ArticulationView
 from omni.isaac.core.utils.prims import get_prim_at_path
 from omni.isaac.core.prims import RigidPrimView
 from omni.isaac.core.objects import DynamicCuboid, DynamicSphere
+import omni.replicator.core as rep
+from omni.replicator.isaac.scripts.writers.pytorch_listener import PytorchListener
+from omni.replicator.isaac.scripts.writers.pytorch_writer import PytorchWriter
+from gym import spaces
+# import matplotlib.pyplot as plt
 
+from omni.isaac.core.utils.stage import get_current_stage
+from pxr import UsdPhysics, UsdLux
 import omni
 
 from omni.isaac.core.utils.prims import get_prim_at_path
@@ -68,8 +75,13 @@ class JackalVisionTask(RLTask):
         self._max_velocity = 20.0
         self._max_episode_length = self._task_cfg["env"]["maxEpisodeLength"]
 
-        self._num_observations = 9
+        self._num_observations = 49152
         self._num_actions = 2
+
+        self._img_width = self._task_cfg["env"]["imgWidth"]
+        self._img_height = self._task_cfg["env"]["imgHeight"]
+        self._img_chs = self._task_cfg["env"]["imgChannels"]
+        self.observation_space = spaces.Box(low=0.0, high=1.0, shape=(self._img_width, self._img_height, self._img_chs), dtype=np.float32)
         
 
         RLTask.__init__(self, name, env)
@@ -78,6 +90,8 @@ class JackalVisionTask(RLTask):
         self.y_unit_tensor = torch.tensor([0, 1, 0], dtype=torch.float, device=self.device).repeat((self.num_envs, 1))
         self.z_unit_tensor = torch.tensor([0, 0, 1], dtype=torch.float, device=self.device).repeat((self.num_envs, 1))
         self.target_position = torch.tensor([0.5, 2.0, 0], device=self.device)
+
+        self.obs_buf = torch.zeros((self.num_envs, self._img_width, self._img_height, self._img_chs), device=self.device, dtype=torch.float)
 
         return
 
@@ -95,7 +109,7 @@ class JackalVisionTask(RLTask):
         scene.add(self._walls)
         scene.add(self._left_door)
         scene.add(self._right_door)
-        # scene.add_ground_plane(size=200.0, color=torch.tensor([0.01,0.01,0.01]))
+        scene.add_ground_plane(size=800.0, color=torch.tensor([0.01,0.01,0.01]))
 
         self.root_pos, self.root_rot = self._jackals.get_world_poses(clone=False)
         # self.dof_pos = self._jackals.get_joint_positions(clone=False)
@@ -106,6 +120,25 @@ class JackalVisionTask(RLTask):
         self.initial_root_pos, self.initial_root_rot = self.root_pos.clone(), self.root_rot.clone()
         self.initial_left_pos, self.initial_left_rot = self.left_root_pos.clone(), self.left_root_rot.clone()
         self.initial_right_pos, self.initial_right_rot = self.right_root_pos.clone(), self.right_root_rot.clone()
+
+        # prim_path="/World/defaultDistantLight", intensity=5000
+        # stage = get_current_stage()
+        # light = UsdLux.DistantLight.Define(stage, prim_path)
+        # light.GetPrim().GetAttribute("intensity").Set(intensity)
+
+
+        render_products = []
+        for i in range(self.num_envs):
+            camera= rep.create.camera(position=(self.root_pos[i,:].cpu().numpy() + np.array([0.0,-3.0,6.0])), rotation=(0.0,-50.0,-90))
+            rp = rep.create.render_product(camera,resolution=(self._img_width,self._img_height))
+            render_products.append(rp)
+
+        self.listener = PytorchListener()
+        rep.WriterRegistry.register(PytorchWriter)
+        self.writer = rep.WriterRegistry.get("PytorchWriter")
+        self.writer.initialize(listener=self.listener,device=self.device)
+        self.writer.attach(render_products)
+
 
         return
 
@@ -126,7 +159,7 @@ class JackalVisionTask(RLTask):
                 prim_path=self.default_zero_env_path + "/left_door", # The prim path of the cube in the USD stage
                 name="left_door", # The unique name used to retrieve the object from the scene later on
                 position=np.array([-1.0, 0.3, 1.105]), # Using the current stage units which is in meters by default.
-                scale=np.array([20.0, 10.0, 44.0]), # most arguments accept mainly numpy arrays.
+                scale=np.array([1.0, 0.5, 2.2]), # most arguments accept mainly numpy arrays.
                 color=np.array([1.0, 1.0, 1.0]), # RGB channels, going from 0-1
                 mass=1000
             )
@@ -135,7 +168,7 @@ class JackalVisionTask(RLTask):
                 prim_path=self.default_zero_env_path + "/right_door", # The prim path of the cube in the USD stage
                 name="right_door", # The unique name used to retrieve the object from the scene later on
                 position=np.array([1.0, 0.3, 1.105]), # Using the current stage units which is in meters by default.
-                scale=np.array([20.0, 10.0, 44.0]), # most arguments accept mainly numpy arrays.
+                scale=np.array([1.0, 0.5, 2.2]), # most arguments accept mainly numpy arrays.
                 color=np.array([1.0, 1.0, 1.0]), # RGB channels, going from 0-1
                 mass=1000
             )
@@ -158,6 +191,7 @@ class JackalVisionTask(RLTask):
     #     self.view_port.set_active_camera(self.perspective_path)
 
     def get_observations(self) -> dict:
+
         self.root_pos, self.root_rot = self._jackals.get_world_poses(clone=False)
         self.root_right_pos, _ = self._right_door.get_world_poses(clone=False)
         self.root_left_pos, _ = self._left_door.get_world_poses(clone=False)
@@ -165,16 +199,28 @@ class JackalVisionTask(RLTask):
         root_positions = self.root_pos - self._env_pos
         
         # root_positions = self.root_pos
-        self.obs_buf[..., 0:3] = root_positions
-        self.obs_buf[..., 3:7] = self.root_rot
-        self.obs_buf[..., 7] = self.root_right_pos[:,0]
-        self.obs_buf[..., 8] = self.root_left_pos[:,0]
+        # self.obs_buf[..., 0:3] = root_positions
+        # self.obs_buf[..., 3:7] = self.root_rot
+        # self.obs_buf[..., 7] = self.root_right_pos[:,0]
+        # self.obs_buf[..., 8] = self.root_left_pos[:,0]
 
-        observations = {
-            self._jackals.name: {
-                "obs_buf": self.obs_buf
-            }
-        }
+
+
+        self.obs_buf =self.listener.get_rgb_data().permute(0, 2, 3, 1)
+
+        # self.imgplot = plt.imshow(self.obs_buf.cpu().numpy()[0,:,:,:])
+        # plt.savefig("mygraph.png")
+
+        # self.obs_buf = self.obs_buf
+
+
+        # .view(self.num_envs, 3, 128,128)
+        # .flatten(start_dim=1)
+
+            
+
+        observations = self.obs_buf
+
         return observations
 
     def pre_physics_step(self, actions) -> None:
@@ -246,7 +292,7 @@ class JackalVisionTask(RLTask):
         # self.initial_right_pos, self.initial_right_rot = self.right_root_pos.clone(), self.right_root_rot.clone()
 
     def calculate_metrics(self) -> None:
-        jackal_pos = self.obs_buf[..., 0:3]
+        jackal_pos = self.root_pos
 
         # cart_pos = self.obs_buf[:, 0]
         # cart_vel = self.obs_buf[:, 1]
@@ -266,7 +312,7 @@ class JackalVisionTask(RLTask):
         self.rew_buf[:] = reward
 
     def is_done(self) -> None:
-        jackal_pos = self.obs_buf[..., 0:3]
+        jackal_pos = self.root_pos
 
 
         dist = ((jackal_pos-self.target_position)**2).sum(axis=1)

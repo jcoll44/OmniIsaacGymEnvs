@@ -11,7 +11,6 @@ env:
   maxEffort: 400.0
   maxEpisodeLength: 500
 
-  clipObservations: 5.0
   clipActions: 2.0
   controlFrequencyInv: 2 # 60 Hz
 
@@ -25,7 +24,7 @@ sim:
   enable_scene_query_support: False
 
   # set to True if you use camera sensors in the environment
-  enable_cameras: False
+  enable_cameras: True
 
   default_physics_material:
     static_friction: 1.0
@@ -48,9 +47,9 @@ sim:
     max_depenetration_velocity: 100.0
 
     # GPU buffers
-    gpu_max_rigid_contact_count: 524288
-    gpu_max_rigid_patch_count: 81920
-    gpu_found_lost_pairs_capacity: 57042
+    gpu_max_rigid_contact_count: 519952
+    gpu_max_rigid_patch_count: 519952
+    gpu_found_lost_pairs_capacity: 296442
     gpu_found_lost_aggregate_pairs_capacity: 1048576
     gpu_total_aggregate_pairs_capacity: 524288
     gpu_max_soft_body_contacts: 1048576
