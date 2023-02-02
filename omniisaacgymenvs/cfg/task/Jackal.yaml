@@ -3,6 +3,7 @@ name: Jackal
 
 physics_engine: ${..physics_engine}
 
+
 # if given, will override the device setting in gym. 
 env:
   numEnvs: ${resolve_default:4096,${...num_envs}}
@@ -18,7 +19,7 @@ sim:
   dt: 0.0083 # 1/120 s
   use_gpu_pipeline: ${eq:${...pipeline},"gpu"}
   gravity: [0.0, 0.0, -9.81]
-  add_ground_plane: true
+  add_ground_plane: True
   add_distant_light: True
   use_flatcache: True
   enable_scene_query_support: False
