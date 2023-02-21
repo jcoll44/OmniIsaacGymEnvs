@@ -15,6 +15,7 @@ env:
   clipActions: 2.0
   controlFrequencyInv: 2 # 60 Hz
 
+  stackedImages: 4
   imgWidth: 128
   imgHeight: 128
   imgChannels: 3

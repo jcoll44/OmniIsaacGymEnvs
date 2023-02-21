@@ -53,6 +53,13 @@ import numpy as np
 import torch
 import math
 
+"""
+To-Do
+1. Merge changes to environment from Jackal task
+2. Add more lighting so it is consistent throughout the environment
+3.
+"""
+
 
 class JackalVisionTask(RLTask):
     def __init__(
@@ -78,10 +85,12 @@ class JackalVisionTask(RLTask):
         self._num_observations = 49152
         self._num_actions = 2
 
+        self._stacked_images = self._task_cfg["env"]["stackedImages"]
         self._img_width = self._task_cfg["env"]["imgWidth"]
         self._img_height = self._task_cfg["env"]["imgHeight"]
         self._img_chs = self._task_cfg["env"]["imgChannels"]
-        self.observation_space = spaces.Box(low=0.0, high=1.0, shape=(self._img_width, self._img_height, self._img_chs), dtype=np.float32)
+
+        self.observation_space = spaces.Box(low=0.0, high=1.0, shape=(self._img_width, self._img_height, self._img_chs*self._stacked_images), dtype=np.float32)
         
 
         RLTask.__init__(self, name, env)
@@ -91,7 +100,8 @@ class JackalVisionTask(RLTask):
         self.z_unit_tensor = torch.tensor([0, 0, 1], dtype=torch.float, device=self.device).repeat((self.num_envs, 1))
         self.target_position = torch.tensor([0.5, 2.0, 0], device=self.device)
 
-        self.obs_buf = torch.zeros((self.num_envs, self._img_width, self._img_height, self._img_chs), device=self.device, dtype=torch.float)
+        self.obs_buf = torch.zeros((self.num_envs, self._img_width, self._img_height, self._img_chs*self._stacked_images), device=self.device, dtype=torch.float)
+        self._past_oberservations = torch.zeros((self.num_envs, self._img_width, self._img_height, self._img_chs*(self._stacked_images-1)), device=self.device, dtype=torch.float)
 
         return
 
@@ -204,9 +214,17 @@ class JackalVisionTask(RLTask):
         # self.obs_buf[..., 7] = self.root_right_pos[:,0]
         # self.obs_buf[..., 8] = self.root_left_pos[:,0]
 
+        self.obs_buf = torch.zeros((self.num_envs, self._img_width, self._img_height, self._img_chs*self._stacked_images), device=self.device, dtype=torch.float)
 
 
-        self.obs_buf =self.listener.get_rgb_data().permute(0, 2, 3, 1)
+        current_obs =self.listener.get_rgb_data().permute(0, 2, 3, 1)
+
+        self.obs_buf[:,:,:,0:self._img_chs*(self._stacked_images-1)] = self._past_oberservations
+        self.obs_buf[:,:,:,self._img_chs*(self._stacked_images-1):] = current_obs
+
+
+        self._past_oberservations = self.obs_buf[:,:,:,self._img_chs*1:]
+
 
         # self.imgplot = plt.imshow(self.obs_buf.cpu().numpy()[0,:,:,:])
         # plt.savefig("mygraph.png")
@@ -273,6 +291,11 @@ class JackalVisionTask(RLTask):
         # root_pos[env_ids, 2] += 0.01
 
         self._right_door.set_world_poses(root_pos[env_ids], self.initial_root_rot[env_ids].clone(), indices=env_ids)
+
+        # self._past_oberservations[env_ids,:,:,:] = torch.zeros((num_resets, self._img_width, self._img_height, self._img_chs*(self._stacked_images-1)), device=self.device, dtype=torch.float)
+        obs_array = torch.zeros((self.num_envs, self._img_width, self._img_height, self._img_chs*(self._stacked_images-1)), device=self.device, dtype=torch.float)
+        self._past_oberservations[env_ids,:,:,:] = obs_array[env_ids,:,:,:]
+
 
         # bookkeeping
         self.reset_buf[env_ids] = 0

@@ -46,6 +46,12 @@ import numpy as np
 import torch
 import math
 
+"""
+1. Discretise control space
+2. Length of simulation
+3. Ensure the noise is consistent
+"""
+
 
 class JackalTask(RLTask):
     def __init__(
@@ -71,7 +77,9 @@ class JackalTask(RLTask):
         self._dt = self._task_cfg["sim"]["dt"]
 
         self._num_observations = 9
-        self._num_actions = 2
+        self._num_actions = 4
+
+        self.action_space = spaces.Discrete(self._num_actions)
 
 
 
@@ -194,24 +202,36 @@ class JackalTask(RLTask):
         if len(reset_env_ids) > 0:
             self.reset_idx(reset_env_ids)
 
+
+        # Discretised Actions
         actions = actions.to(self._device)
-        actions = torch.where(actions > 1.0, (actions-1)*-1, actions)
+        # actions = torch.where(actions > 1.0, (actions-1)*-1, actions)
         # actions = actions - 1
         # actions = actions.repeat(1, 2)
         # Add action conditional later
+
+        # Continuous linear and angular velocities
+        body_velocities = torch.zeros((self._jackals.count, 2), dtype=torch.float32, device=self._device)
+        # linear velocity
+        body_velocities[:,0] = torch.where(actions == 0 , 2.0, 0.0)
+        body_velocities[:,0] = torch.where(actions == 1 || actions==2 , 2.0, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 3 , -2.0, body_velocities[:,0])
+        # angular velocity
+        body_velocities[:,1] = torch.where(actions == 1, 30.0, 0.0)
+        body_velocities[:,1] = torch.where(actions == 2, -30.0, body_velocities[:,1])
+
+        # Save to an array to add noise
+        self._action_array[:,0,0] = torch.where(self._noise_level == 0, body_velocities[:,0], self._action_array[:,0,0])
+        self._action_array[:,0,1] = torch.where(self._noise_level == 0, body_velocities[:,1], self._action_array[:,0,1])
+        self._action_array[:,int(self._noise_choices[1]/self._dt),0] = torch.where(self._noise_level == 1, body_velocities[:,0], self._action_array[:,int(self._noise_choices[1]/self._dt),0])
+        self._action_array[:,int(self._noise_choices[1]/self._dt),1] = torch.where(self._noise_level == 1, body_velocities[:,1], self._action_array[:,int(self._noise_choices[1]/self._dt),1])
+        self._action_array[:,-1,0] = torch.where(self._noise_level == 2, body_velocities[:,0], self._action_array[:,-1,0])
+        self._action_array[:,-1,1] = torch.where(self._noise_level == 2, body_velocities[:,1], self._action_array[:,-1,1])
+
+
         velocity = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
-
-
-        self._action_array[:,0,0] = torch.where(self._noise_level == 0, actions[:,0], self._action_array[:,0,0])
-        self._action_array[:,0,1] = torch.where(self._noise_level == 0, actions[:,1], self._action_array[:,0,1])
-        self._action_array[:,int(self._noise_choices[1]/self._dt),0] = torch.where(self._noise_level == 1, actions[:,0], self._action_array[:,int(self._noise_choices[1]/self._dt),0])
-        self._action_array[:,int(self._noise_choices[1]/self._dt),1] = torch.where(self._noise_level == 1, actions[:,1], self._action_array[:,int(self._noise_choices[1]/self._dt),1])
-        self._action_array[:,-1,0] = torch.where(self._noise_level == 2, actions[:,0], self._action_array[:,-1,0])
-        self._action_array[:,-1,1] = torch.where(self._noise_level == 2, actions[:,1], self._action_array[:,-1,1])
-
-
-        velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0]*2,self._action_array[:,0,1]*30)
-        velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0]*2,self._action_array[:,0,1]*30)
+        velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
+        velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
 
 
         # velocity[:,0],velocity[:,1] = self.wheel_velocities(actions[:,0]*2,actions[:,1]*30)
@@ -314,6 +334,10 @@ class JackalTask(RLTask):
 
         resets = torch.where(torch.abs(dist) < 0.5, 1, 0)
         resets = torch.where(self.progress_buf >= self._max_episode_length - 1, torch.ones_like(self.reset_buf), resets)
+
+        # original code from Raunak on how to calculate termination state
+        # xgoal_lo=0.0,xgoal_hi=1.0,ygoal_lo=1.0,ygoal_hi=2.0
+        # if bot_yloc >ygoal_lo and bot_yloc<ygoal_hi and bot_xloc>xgoal_lo and bot_xloc<xgoal_hi:
         # resets = torch.where(torch.abs(pole_pos) > math.pi / 2, 1, resets)
         # resets = torch.where(self.progress_buf >= self._max_episode_length, 1, resets)
         self.reset_buf[:] = resets
