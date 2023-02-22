@@ -41,6 +41,7 @@ import omni
 from omni.isaac.core.utils.prims import get_prim_at_path
 from omni.isaac.core.utils.torch.rotations import *
 from pxr import PhysicsSchemaTools, PhysxSchema
+from gym import spaces
 
 import numpy as np
 import torch
@@ -93,6 +94,8 @@ class JackalTask(RLTask):
         self._noise_choices  = [0.0, 0.07, 0.1]
         self._noise_level = torch.zeros([self._num_envs], dtype=torch.int64, device=self.device)
         self._action_array = torch.zeros([self._num_envs, int(self._noise_choices[-1]/self._dt), 2], dtype=torch.float , device=self.device)
+
+        self.action_space = spaces.Discrete(self._num_actions)
 
 
         return
@@ -204,7 +207,12 @@ class JackalTask(RLTask):
 
 
         # Discretised Actions
+        if actions.ndim > 1:
+            actions = actions[:,0]
+        else:
+            actions = actions
         actions = actions.to(self._device)
+        # actions = torch.argmax(actions, dim=1)
         # actions = torch.where(actions > 1.0, (actions-1)*-1, actions)
         # actions = actions - 1
         # actions = actions.repeat(1, 2)
@@ -213,12 +221,13 @@ class JackalTask(RLTask):
         # Continuous linear and angular velocities
         body_velocities = torch.zeros((self._jackals.count, 2), dtype=torch.float32, device=self._device)
         # linear velocity
-        body_velocities[:,0] = torch.where(actions == 0 , 2.0, 0.0)
-        body_velocities[:,0] = torch.where(actions == 1 || actions==2 , 2.0, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 3 , -2.0, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 0 , 1.0, 0.0)
+        body_velocities[:,0] = torch.where(actions == 1, 1.0, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 2, 1.0, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 3 , -1.0, body_velocities[:,0])
         # angular velocity
-        body_velocities[:,1] = torch.where(actions == 1, 30.0, 0.0)
-        body_velocities[:,1] = torch.where(actions == 2, -30.0, body_velocities[:,1])
+        body_velocities[:,1] = torch.where(actions == 1, 15.0, 0.0)
+        body_velocities[:,1] = torch.where(actions == 2, -15.0, body_velocities[:,1])
 
         # Save to an array to add noise
         self._action_array[:,0,0] = torch.where(self._noise_level == 0, body_velocities[:,0], self._action_array[:,0,0])

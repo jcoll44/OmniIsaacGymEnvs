@@ -44,7 +44,8 @@ class Walls(Robot):
         self,
         prim_path: str,
         name: Optional[str] = "Wall",
-        usd_path: Optional[str] = "/home/jcollins/Documents/OmniIsaacGymEnvs/omniisaacgymenvs/assets/scene.usd",
+        usd_path: Optional[str] = "/home/jcollins/Documents/Projects/Metacognition/OmniIsaacGymEnvs/omniisaacgymenvs/assets/scene.usd",  #/home/jcollins/Documents/OmniIsaacGymEnvs/omniisaacgymenvs/assets/scene.usd || /home/jcollins/Documents/Projects/Metacognition/OmniIsaacGymEnvs/omniisaacgymenvs/assets/scene.usd
+
         translation: Optional[np.ndarray] = None,
         orientation: Optional[np.ndarray] = None,
     ) -> None:

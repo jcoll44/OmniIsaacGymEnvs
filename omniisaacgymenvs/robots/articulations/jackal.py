@@ -41,7 +41,7 @@ class Jackal(Robot):
         self,
         prim_path: str,
         name: Optional[str] = "Jackal",
-        usd_path: Optional[str] = "/home/jcollins/Documents/OmniIsaacGymEnvs/omniisaacgymenvs/assets/jackal/jackal.usd",
+        usd_path: Optional[str] = "/home/jcollins/Documents/Projects/Metacognition/OmniIsaacGymEnvs/omniisaacgymenvs/assets/jackal/jackal.usd", #/home/jcollins/Documents/OmniIsaacGymEnvs/omniisaacgymenvs/assets/jackal/jackal.usd   || /home/jcollins/Documents/Projects/Metacognition/OmniIsaacGymEnvs/omniisaacgymenvs/assets/jackal/jackal.usd
         translation: Optional[np.ndarray] = None,
         orientation: Optional[np.ndarray] = None,
     ) -> None:
