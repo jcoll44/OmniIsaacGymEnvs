@@ -52,93 +52,9 @@ from rl_games.common import env_configurations, vecenv
 from rl_games.torch_runner import Runner
 
 
-# class RLGTrainer():
-#     def __init__(self, cfg, cfg_dict):
-#         self.cfg = cfg
-#         self.cfg_dict = cfg_dict
-#         self.cfg.test = True
-
-#     def launch_rlg_hydra(self, env):
-#         # `create_rlgpu_env` is environment construction function which is passed to RL Games and called internally.
-#         # We use the helper function here to specify the environment config.
-#         self.cfg_dict["task"]["test"] = self.cfg.test
-
-#         # register the rl-games adapter to use inside the runner
-#         vecenv.register('RLGPU',
-#                         lambda config_name, num_actors, **kwargs: RLGPUEnv(config_name, num_actors, **kwargs))
-#         env_configurations.register('rlgpu', {
-#             'vecenv_type': 'RLGPU',
-#             'env_creator': lambda **kwargs: env
-#         })
-
-#         self.rlg_config_dict = omegaconf_to_dict(self.cfg.train)
-
-#     def run(self):
-#         # create runner and set the settings
-
-#         agent = Runner.create_player()
-#         agent.restore(self.rlg_config_dict)
-#         runner.reset()
-
-
-#         runner = Runner(RLGPUAlgoObserver())
-#         runner.load(self.rlg_config_dict)
-#         runner.reset()
-
-#         qps = []
-#         obs = env.reset()
-#         total_reward = 0
-#         num_steps = 0
-
-#         is_done = False
-#         while not is_done:
-#             # qps.append(QP(env.env._state.qp))
-#             act = agent.get_action(obs)
-#             obs, reward, is_done, info = env.step(act.unsqueeze(0))
-#             total_reward += reward.item()
-#             num_steps += 1
-
-#         print('Total Reward: ', total_reward)
-#         print('Num steps: ', num_steps)
-
-    
-
-# @hydra.main(config_name="config", config_path="../cfg")
-# def parse_hydra_configs(cfg: DictConfig):
-
-#     time_str = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-#     headless = cfg.headless
-#     env = VecEnvRLGames(headless=headless, sim_device=cfg.device_id)
-
-#     # ensure checkpoints can be specified as relative paths
-#     if cfg.checkpoint:
-#         cfg.checkpoint = retrieve_checkpoint_path(cfg.checkpoint)
-#         if cfg.checkpoint is None:
-#             quit()
-
-#     cfg_dict = omegaconf_to_dict(cfg)
-#     print_dict(cfg_dict)
-
-#     task = initialize_demo(cfg_dict, env)
-
-#     # sets seed. if seed is -1 will pick a random one
-#     from omni.isaac.core.utils.torch.maths import set_seed
-#     cfg.seed = set_seed(cfg.seed, torch_deterministic=cfg.torch_deterministic)
-
-#     if cfg.wandb_activate:
-#         # Make sure to install WandB if you actually use this.
-#         import wandb
-
-#         run_name = f"{cfg.wandb_name}_{time_str}"
-
-
-#     rlg_trainer = RLGTrainer(cfg, cfg_dict)
-#     rlg_trainer.launch_rlg_hydra(env)
-#     rlg_trainer.run()
-#     env.close()
-
-
+"""
+PYTHON_PATH scripts/rlgames_confidence_ccbp.py task=Jackal headless=True checkpoint=runs/Jackal/nn/Jackal.pth test=True num_envs=100
+"""
 
 @hydra.main(config_name="config", config_path="../cfg")
 def parse_hydra_configs(cfg: DictConfig):
@@ -180,10 +96,11 @@ def parse_hydra_configs(cfg: DictConfig):
     agent.restore(cfg.checkpoint)
     agent.has_batch_dimension = True
 
-    #for confidence estimate
+    # Dataset for nonoparametric model for measuring confidence using training environment without noise
     experience = Experience(prior_alpha = 0.0, prior_beta=0.0, length_scale=0.7, num_env = cfg.num_envs)
 
     while env._simulation_app.is_running() and env.sim_frame_count<1000:
+        print(env.sim_frame_count)
         if env._world.is_playing():
             if env._world.current_time_step_index == 0:
                 obs = env._world.reset(soft=True)
@@ -200,33 +117,77 @@ def parse_hydra_configs(cfg: DictConfig):
         else:
             env._world.step(render=render)
 
-    env._simulation_app.close()
 
-    # 0.0, -2.0
-    # -1.5, 1.5
-    # -0.3, 0.2
 
     print(len(experience.successful_states))
-    x_init_space = np.linspace(-1.5,1.5, 10)
-    y_init_space = np.linspace(-2.3,1.8, 10)
-    X, Y = np.meshgrid(x_init_space, y_init_space)
-    Z = np.zeros_like(X)
-    for i,x in enumerate(x_init_space):
-        for j,y in enumerate(y_init_space):
-            state = np.array([x,y, 0.0635, 0.70711 , 0., 0., 0.70711, -1.2, 1.5])
-            Z[i,j], sigma, alpha, beta = experience.get_state_value(state)
+
+
+
+    # Create the assessment environment
+    x_init_space = np.linspace(-1.5,1.5, 2)
+    y_init_space = np.linspace(-0.3, 0.2, 2) # y pos is -2 + this offset
+    yaw_init_space = np.linspace(0.0, 3.14, 2) 
+    left_door_init_space = np.linspace(-0.2,0.3,2) #left door x is -1 + this offset
+    right_door_init_space = np.linspace(-0.3,0.5,2) # right door x is 1 + this offset
+
+    X, Y, YAW, LEFT, RIGHT = np.meshgrid(x_init_space, y_init_space, yaw_init_space, left_door_init_space, right_door_init_space)
+    Prediction = np.zeros_like(X)
+
+    for i,v in enumerate(x_init_space):
+        for j,w in enumerate(y_init_space):
+            for k,x in enumerate(yaw_init_space):
+                for l,y in enumerate(left_door_init_space):
+                    for m,z in enumerate(right_door_init_space):
+                        state = np.array([v, w-2.0, x, y-1.0, z+1.0])
+                        Prediction[i,j,k,l,m], sigma, alpha, beta = experience.get_state_value(state)
     # print(value, sigma, alpha, beta)
 
+    X = X.flatten()
+    Y = Y.flatten()
+    YAW = YAW.flatten()
+    LEFT = LEFT.flatten()
+    RIGHT = RIGHT.flatten()
 
-    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    # Plot the surface.
-    surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
-                       linewidth=0, antialiased=False)
-    # Add a color bar which maps values to colors.
-    fig.colorbar(surf, shrink=0.5, aspect=5)
+    # environmnents = np.vstack((X,Y,YAW,LEFT,RIGHT)).T
+    print(X.shape)
 
-    # plt.show()
-    plt.savefig("mygraph.png")
+    successful_states = np.zeros_like(X)
+
+
+
+
+# 
+
+
+
+    env.sim_frame_count=0
+    obs = env._world.reset(soft=True)
+    while env._simulation_app.is_running() and env.sim_frame_count<500:
+        if env._world.is_playing():
+            if env._world.current_time_step_index == 0:
+                obs = env._world.reset(soft=True)
+                env.set_start_state(X, Y, YAW, LEFT, RIGHT)
+            obs = env._task.get_observations()["jackal_view"]["obs_buf"]
+            obs = obs.view(cfg.num_envs, -1)
+            # actions = torch.tensor(np.array([env.action_space.sample() for _ in range(env.num_envs)]), device=task.rl_device)
+            actions = agent.get_action(obs)
+            # actions = actions.unsqueeze(0)
+            env._task.pre_physics_step(actions)
+            env._world.step(render=render)
+            obs_buf, rew_buf, reset_buf, extras  = env._task.post_physics_step()
+            print(rew_buf)
+            print(reset_buf)
+            successful_states += np.where(((rew_buf.cpu().detach().numpy() > 0) & (reset_buf.cpu().detach().numpy() == 1)), 1, 0)[X.shape[0]]
+            env.sim_frame_count += 1
+        else:
+            env._world.step(render=render)
+
+    print(successful_states)
+    print(Prediction.flatten())
+
+    env._simulation_app.close()
+
+
 
 
 if __name__ == '__main__':

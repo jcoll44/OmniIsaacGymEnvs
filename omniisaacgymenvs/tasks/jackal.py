@@ -319,14 +319,14 @@ class JackalTask(RLTask):
         # self.initial_right_pos, self.initial_right_rot = self.right_root_pos.clone(), self.right_root_rot.clone()
 
     def calculate_metrics(self) -> None:
-        jackal_pos = self.obs_buf[..., 0:3]
+        jackal_pos = self.obs_buf[..., 0:2]
 
         # cart_pos = self.obs_buf[:, 0]
         # cart_vel = self.obs_buf[:, 1]
         # pole_angle = self.obs_buf[:, 2]
         # pole_vel = self.obs_buf[:, 3]
 
-        dist = ((jackal_pos-self.target_position)**2).sum(axis=1)
+        dist = ((jackal_pos-self.target_position[0:2])**2).sum(axis=1)
         reward1 = torch.exp(dist/10)*-1
         reward2 = torch.where(torch.abs(dist) < 0.5, 100, 0)
         reward = reward1+reward2
@@ -339,10 +339,10 @@ class JackalTask(RLTask):
         self.rew_buf[:] = reward
 
     def is_done(self) -> None:
-        jackal_pos = self.obs_buf[..., 0:3]
+        jackal_pos = self.obs_buf[..., 0:2]
 
 
-        dist = ((jackal_pos-self.target_position)**2).sum(axis=1)
+        dist = ((jackal_pos-self.target_position[0:2])**2).sum(axis=1)
 
         # pole_pos = self.obs_buf[:, 2]
 
