@@ -48,9 +48,26 @@ import torch
 import math
 
 """
-1. Discretise control space
-2. Length of simulation
-3. Ensure the noise is consistent
+1. Add noise/delayed actions at will. Only 1 delay is required
+2. Allow test points to be assessed at will
+3. 
+"""
+"""
+Process
+1. Train an agent in an environment without noise
+2. Assess the metacognitive ability of CCBP at set start states - the dataset for creating the CCBP must be the same as the training one.
+3. Save a dataset for training a classifier using the training environment data
+4. Assess the classifier at the set start states like CCBP
+"""
+
+"""
+docker run --name isaac-sim --entrypoint bash -it --gpus all -e "ACCEPT_EULA=Y" --rm --network=host     -v /usr/share/vulkan/icd.d/nvidia_icd.json:/etc/vulkan/icd.d/nvidia_icd.json     -v /usr/share/vulkan/implicit_layer.d/nvidia_layers.json:/etc/vulkan/implicit_layer.d/nvidia_layers.json     -v /usr/share/glvnd/egl_vendor.d/10_nvidia.json:/usr/share/glvnd/egl_vendor.d/10_nvidia.json     -v ~/docker/isaac-sim/cache/ov:/root/.cache/ov:rw     -v ~/docker/isaac-sim/cache/pip:/root/.cache/pip:rw     -v ~/docker/isaac-sim/cache/glcache:/root/.cache/nvidia/GLCache:rw     -v ~/docker/isaac-sim/cache/computecache:/root/.nv/ComputeCache:rw     -v ~/docker/isaac-sim/logs:/root/.nvidia-omniverse/logs:rw     -v ~/docker/isaac-sim/config:/root/.nvidia-omniverse/config:rw     -v ~/docker/isaac-sim/data:/root/.local/share/ov/data:rw     -v ~/docker/isaac-sim/documents:/root/Documents:rw  -v ~/Documents/:/home/Documents   nvcr.io/nvidia/isaac-sim:2022.2.0
+alias PYTHON_PATH=/isaac-sim/python.sh
+cd /home/Documents/OmniIsaacGymEnvs/
+PYTHON_PATH -m pip install -e .
+PYTHON_PATH -m pip install wandb
+cd omniisaacgymenvs
+PYTHON_PATH scripts/rlgames_train.py task=Jackal headless=True wandb_activate=True wandb_project=Jackal_Meta wandb_entity=jcoll44
 """
 
 
@@ -77,7 +94,9 @@ class JackalTask(RLTask):
 
         self._dt = self._task_cfg["sim"]["dt"]
 
-        self._num_observations = 9
+        self._noise_amount = self._task_cfg["env"]["noiseAmount"]
+
+        self._num_observations = 5
         self._num_actions = 4
 
         self.action_space = spaces.Discrete(self._num_actions)
@@ -91,9 +110,11 @@ class JackalTask(RLTask):
         self.z_unit_tensor = torch.tensor([0, 0, 1], dtype=torch.float, device=self.device).repeat((self.num_envs, 1))
         self.target_position = torch.tensor([0.5, 2.0, 0], device=self.device)
 
-        self._noise_choices  = [0.0, 0.07, 0.1]
-        self._noise_level = torch.zeros([self._num_envs], dtype=torch.int64, device=self.device)
-        self._action_array = torch.zeros([self._num_envs, int(self._noise_choices[-1]/self._dt), 2], dtype=torch.float , device=self.device)
+        if self._noise_amount <= self._dt:
+            self._action_array = torch.zeros([self._num_envs, 1, 2], dtype=torch.float , device=self.device)
+        else:
+            self._action_array = torch.zeros([self._num_envs, round(self._noise_amount/self._dt), 2], dtype=torch.float , device=self.device)
+
 
         self.action_space = spaces.Discrete(self._num_actions)
 
@@ -182,12 +203,14 @@ class JackalTask(RLTask):
         self.root_left_pos, _ = self._left_door.get_world_poses(clone=False)
 
         root_positions = self.root_pos - self._env_pos
+
+        roll,pitch,yaw = get_euler_xyz(self.root_rot)
         
         # root_positions = self.root_pos
-        self.obs_buf[..., 0:3] = root_positions
-        self.obs_buf[..., 3:7] = self.root_rot
-        self.obs_buf[..., 7] = self.root_right_pos[:,0]
-        self.obs_buf[..., 8] = self.root_left_pos[:,0]
+        self.obs_buf[..., 0:2] = root_positions[:,:2]
+        self.obs_buf[..., 2] = yaw
+        self.obs_buf[..., 3] = self.root_right_pos[:,0]
+        self.obs_buf[..., 4] = self.root_left_pos[:,0]
 
         # torch.set_printoptions(threshold=10_000)
         # print(self.obs_buf) # prints the whole tensor
@@ -212,43 +235,30 @@ class JackalTask(RLTask):
         else:
             actions = actions
         actions = actions.to(self._device)
-        # actions = torch.argmax(actions, dim=1)
-        # actions = torch.where(actions > 1.0, (actions-1)*-1, actions)
-        # actions = actions - 1
-        # actions = actions.repeat(1, 2)
-        # Add action conditional later
 
-        # Continuous linear and angular velocities
+        # From integers to continuous linear and angular velocities
         body_velocities = torch.zeros((self._jackals.count, 2), dtype=torch.float32, device=self._device)
         # linear velocity
-        body_velocities[:,0] = torch.where(actions == 0 , 1.0, 0.0)
-        body_velocities[:,0] = torch.where(actions == 1, 0.5, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 2, 0.5, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 3 , -1.0, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 0 , 0.5, 0.0)
+        body_velocities[:,0] = torch.where(actions == 1, 0.2, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 2, 0.2, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 3 , -0.5, body_velocities[:,0])
         # angular velocity
         body_velocities[:,1] = torch.where(actions == 1, 15.0, 0.0)
         body_velocities[:,1] = torch.where(actions == 2, -15.0, body_velocities[:,1])
 
         # Save to an array to add noise
-        self._action_array[:,0,0] = torch.where(self._noise_level == 0, body_velocities[:,0], self._action_array[:,0,0])
-        self._action_array[:,0,1] = torch.where(self._noise_level == 0, body_velocities[:,1], self._action_array[:,0,1])
-        self._action_array[:,int(self._noise_choices[1]/self._dt),0] = torch.where(self._noise_level == 1, body_velocities[:,0], self._action_array[:,int(self._noise_choices[1]/self._dt),0])
-        self._action_array[:,int(self._noise_choices[1]/self._dt),1] = torch.where(self._noise_level == 1, body_velocities[:,1], self._action_array[:,int(self._noise_choices[1]/self._dt),1])
-        self._action_array[:,-1,0] = torch.where(self._noise_level == 2, body_velocities[:,0], self._action_array[:,-1,0])
-        self._action_array[:,-1,1] = torch.where(self._noise_level == 2, body_velocities[:,1], self._action_array[:,-1,1])
+        self._action_array[:,-1,0] = body_velocities[:,0]
+        self._action_array[:,-1,1] = body_velocities[:,1]
 
 
         velocity = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
-        # velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
-        # velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
+        velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
+        velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
 
 
-        velocity[:,0],velocity[:,1] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1])
-        velocity[:,2],velocity[:,3] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1])
-
-
-        # forces = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
-        # forces[:, self._cart_dof_idx] = self._max_push_effort * actions[:, 0]
+        # velocity[:,0],velocity[:,1] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1]) #used when not considering noise
+        # velocity[:,2],velocity[:,3] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1])
 
         indices = torch.arange(self._jackals.count, dtype=torch.int32, device=self._device)
         self._jackals.set_joint_velocity_targets(velocity, indices=indices)
@@ -284,17 +294,12 @@ class JackalTask(RLTask):
 
         self._right_door.set_world_poses(root_pos[env_ids], self.initial_root_rot[env_ids].clone(), indices=env_ids)
 
-
-        # print(env_ids)
-        # print(self._noise_level)
         # Add *sleep* between actions - the easiest option will be have an action offset I think
-        choice = torch.randint(0, len(self._noise_choices), (num_resets,), device=self._device)
-        self._noise_level[env_ids] = choice
-        # print(self._noise_level)
-
-        action_array = torch.zeros([self._num_envs, int(self._noise_choices[-1]/self._dt), 2], dtype=torch.float, device=self._device )
+        if self._noise_amount <= self._dt:
+            action_array = torch.zeros([self._num_envs, 1, 2], dtype=torch.float , device=self.device)
+        else:
+            action_array = torch.zeros([self._num_envs, round(self._noise_amount/self._dt), 2], dtype=torch.float , device=self.device)
         self._action_array[env_ids,:,:] = action_array[env_ids,:,:]
-
 
         # bookkeeping
         self.reset_buf[env_ids] = 0
@@ -355,6 +360,38 @@ class JackalTask(RLTask):
     def wheel_velocities(self, linear_velocity, angular_volicity):
 
         return (linear_velocity - (0.38/2)*angular_volicity)/0.1, (linear_velocity + (0.38/2)*angular_volicity)/0.1
+
+
+    def update_noise_value(self, noise_value):
+        self._noise_amount = noise_value
+
+        if self._noise_amount <= self._dt:
+            action_array = torch.zeros([self._num_envs, 1, 2], dtype=torch.float , device=self.device)
+        else:
+            action_array = torch.zeros([self._num_envs, round(self._noise_amount/self._dt), 2], dtype=torch.float , device=self.device)
+
+        #Save all the previously commanded values (although this shouldn't be needed as a reset should be done)
+        action_array[:,:,:] = self._action_array[:,:action_array.shape[1],:] #second axis is the only axis of change
+        self._action_array = action_array
+
+    def set_start_state(self, jackal_x, jackal_y, jackal_yaw, left_door, right_door):
+        new_jackal_rot = quat_from_angle_axis(jackal_yaw, self.z_unit_tensor[self._num_envs])
+
+        root_pos = self.initial_root_pos.clone()
+        root_pos[:, 0] += jackal_x
+        root_pos[:, 1] += jackal_y
+        root_velocities = self.root_velocities.clone()
+
+        self._jackals.set_velocities(root_velocities[:])
+        self._jackals.set_world_poses(root_pos[:], new_jackal_rot)
+
+        root_pos = self.initial_left_pos.clone()
+        root_pos[:, 0] += left_door
+        self._left_door.set_world_poses(root_pos[:], self.initial_root_rot[:].clone())
+
+        root_pos = self.initial_right_pos.clone()
+        root_pos[:, 0] += right_door
+        self._right_door.set_world_poses(root_pos[:], self.initial_root_rot[:].clone())
 
 
     # def post_physics_step(self):
