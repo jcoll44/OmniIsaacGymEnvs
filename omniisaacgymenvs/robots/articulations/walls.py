@@ -32,7 +32,7 @@ import torch
 from omni.isaac.core.robots.robot import Robot
 from omni.isaac.core.utils.nucleus import get_assets_root_path
 from omni.isaac.core.utils.stage import add_reference_to_stage
-
+import os
 import numpy as np
 import torch
 import carb
@@ -44,7 +44,7 @@ class Walls(Robot):
         self,
         prim_path: str,
         name: Optional[str] = "Wall",
-        usd_path: Optional[str] = "/home/jcollins/Documents/Projects/Metacognition/OmniIsaacGymEnvs/omniisaacgymenvs/assets/scene.usd",  #/home/jcollins/Documents/OmniIsaacGymEnvs/omniisaacgymenvs/assets/scene.usd || /home/jcollins/Documents/Projects/Metacognition/OmniIsaacGymEnvs/omniisaacgymenvs/assets/scene.usd
+        usd_path: Optional[str] = "/assets/scene.usd",  #/home/jcollins/Documents/OmniIsaacGymEnvs/omniisaacgymenvs/assets/scene.usd || /home/jcollins/Documents/Projects/Metacognition/OmniIsaacGymEnvs/omniisaacgymenvs/assets/scene.usd
 
         translation: Optional[np.ndarray] = None,
         orientation: Optional[np.ndarray] = None,
@@ -61,7 +61,7 @@ class Walls(Robot):
                 carb.log_error("Could not find nucleus server with /Isaac folder")
             self._usd_path = assets_root_path + "/Isaac/Robots/ANYbotics/anymal_instanceable.usd"
 
-        add_reference_to_stage(self._usd_path, prim_path)
+        add_reference_to_stage(os.getcwd() + self._usd_path, prim_path)
 
         super().__init__(
             prim_path=prim_path,
