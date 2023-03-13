@@ -207,7 +207,7 @@ class JackalTask(RLTask):
 
 
         # Discretised Actions
-        if actions.ndim > 1:
+        if actions.ndim > 1: #for some reason the first action is always 2 dimensional...
             actions = actions[:,0]
         else:
             actions = actions
