@@ -222,8 +222,8 @@ class JackalTask(RLTask):
         body_velocities = torch.zeros((self._jackals.count, 2), dtype=torch.float32, device=self._device)
         # linear velocity
         body_velocities[:,0] = torch.where(actions == 0 , 1.0, 0.0)
-        body_velocities[:,0] = torch.where(actions == 1, 1.0, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 2, 1.0, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 1, 0.5, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 2, 0.5, body_velocities[:,0])
         body_velocities[:,0] = torch.where(actions == 3 , -1.0, body_velocities[:,0])
         # angular velocity
         body_velocities[:,1] = torch.where(actions == 1, 15.0, 0.0)
@@ -239,12 +239,12 @@ class JackalTask(RLTask):
 
 
         velocity = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
-        velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
-        velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
+        # velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
+        # velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
 
 
-        # velocity[:,0],velocity[:,1] = self.wheel_velocities(actions[:,0]*2,actions[:,1]*30)
-        # velocity[:,2],velocity[:,3] = self.wheel_velocities(actions[:,0]*2,actions[:,1]*30)
+        velocity[:,0],velocity[:,1] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1])
+        velocity[:,2],velocity[:,3] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1])
 
 
         # forces = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
