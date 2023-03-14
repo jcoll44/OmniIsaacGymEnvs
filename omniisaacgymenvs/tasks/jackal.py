@@ -205,12 +205,17 @@ class JackalTask(RLTask):
         root_positions = self.root_pos - self._env_pos
 
         roll,pitch,yaw = get_euler_xyz(self.root_rot)
-        
+
+        right_pos = self.root_right_pos - self.initial_right_pos.clone()
+        right_pos[:,0] = right_pos[:,0] - 1.0
+        left_pos = self.root_left_pos - self.initial_left_pos.clone()
+        left_pos[:,0] = left_pos[:,0] + 1.0
+       
         # root_positions = self.root_pos
         self.obs_buf[..., 0:2] = root_positions[:,:2]
         self.obs_buf[..., 2] = yaw
-        self.obs_buf[..., 3] = self.root_right_pos[:,0]
-        self.obs_buf[..., 4] = self.root_left_pos[:,0]
+        self.obs_buf[..., 3] = right_pos[:,0]
+        self.obs_buf[..., 4] = left_pos[:,0]
 
         # torch.set_printoptions(threshold=10_000)
         # print(self.obs_buf) # prints the whole tensor
@@ -239,10 +244,10 @@ class JackalTask(RLTask):
         # From integers to continuous linear and angular velocities
         body_velocities = torch.zeros((self._jackals.count, 2), dtype=torch.float32, device=self._device)
         # linear velocity
-        body_velocities[:,0] = torch.where(actions == 0 , 0.5, 0.0)
-        body_velocities[:,0] = torch.where(actions == 1, 0.2, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 2, 0.2, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 3 , -0.5, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 0 , 0.3, 0.0)
+        body_velocities[:,0] = torch.where(actions == 1, 0.1, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 2, 0.1, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 3 , -0.3, body_velocities[:,0])
         # angular velocity
         body_velocities[:,1] = torch.where(actions == 1, 15.0, 0.0)
         body_velocities[:,1] = torch.where(actions == 2, -15.0, body_velocities[:,1])
@@ -328,8 +333,8 @@ class JackalTask(RLTask):
 
         dist = ((jackal_pos-self.target_position[0:2])**2).sum(axis=1)
         reward1 = torch.exp(dist/10)*-1
-        reward2 = torch.where(torch.abs(dist) < 0.5, 100, 0)
-        reward = reward1+reward2
+        reward2 = torch.where(torch.abs(dist) < 0.5, 10, reward1)
+        reward = reward2
 
 
         # reward = 1.0 - pole_angle * pole_angle - 0.01 * torch.abs(cart_vel) - 0.005 * torch.abs(pole_vel)
