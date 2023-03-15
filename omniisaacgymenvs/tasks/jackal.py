@@ -238,14 +238,17 @@ class JackalTask(RLTask):
         actions = actions.to(self._device)
         actions = torch.where(actions > 1.0, (actions-1)*-1, actions)
 
+        self._action_array[:,-1,0] = actions[:,0]
+        self._action_array[:,-1,1] = actions[:,1]
+
         velocity = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
-        velocity[:,0],velocity[:,1] = self.wheel_velocities(actions[:,0]*2,actions[:,1]*30)
-        velocity[:,2],velocity[:,3] = self.wheel_velocities(actions[:,0]*2,actions[:,1]*30)
+        velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0]*2,self._action_array[:,0,1]*30)
+        velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0]*2,self._action_array[:,0,1]*30)
 
         indices = torch.arange(self._jackals.count, dtype=torch.int32, device=self._device)
         self._jackals.set_joint_velocity_targets(velocity, indices=indices)
 
-
+        self._action_array[:,0:-1,:] = self._action_array[:,1:,:]
 
         # # Discretised Actions
         # if actions.ndim > 1: #for some reason the first action is always 2 dimensional...
@@ -388,27 +391,34 @@ class JackalTask(RLTask):
             action_array = torch.zeros([self._num_envs, round(self._noise_amount/self._dt), 2], dtype=torch.float , device=self.device)
 
         #Save all the previously commanded values (although this shouldn't be needed as a reset should be done)
-        action_array[:,:,:] = self._action_array[:,:action_array.shape[1],:] #second axis is the only axis of change
+        # action_array[:,:,:] = self._action_array[:,:action_array.shape[1],:] #second axis is the only axis of change
         self._action_array = action_array
 
     def set_start_state(self, jackal_x, jackal_y, jackal_yaw, left_door, right_door):
-        new_jackal_rot = quat_from_angle_axis(jackal_yaw, self.z_unit_tensor[self._num_envs])
+        jackal_x = torch.tensor(jackal_x, dtype=torch.float, device=self.device)
+        jackal_y = torch.tensor(jackal_y, dtype=torch.float, device=self.device)
+        jackal_yaw = torch.tensor(jackal_yaw, dtype=torch.float, device=self.device)
+        left_door = torch.tensor(left_door, dtype=torch.float, device=self.device)
+        right_door = torch.tensor(right_door, dtype=torch.float, device=self.device)
+
+        env_ids = [i for i in range(len(jackal_yaw))]
+        new_jackal_rot = quat_from_angle_axis(jackal_yaw, self.z_unit_tensor[env_ids])
 
         root_pos = self.initial_root_pos.clone()
         root_pos[:, 0] += jackal_x
         root_pos[:, 1] += jackal_y
         root_velocities = self.root_velocities.clone()
 
-        self._jackals.set_velocities(root_velocities[:])
-        self._jackals.set_world_poses(root_pos[:], new_jackal_rot)
+        self._jackals.set_velocities(root_velocities[:], indices=env_ids)
+        self._jackals.set_world_poses(root_pos[:], new_jackal_rot, indices=env_ids)
 
         root_pos = self.initial_left_pos.clone()
         root_pos[:, 0] += left_door
-        self._left_door.set_world_poses(root_pos[:], self.initial_root_rot[:].clone())
+        self._left_door.set_world_poses(root_pos[:], self.initial_root_rot[:].clone(), indices=env_ids)
 
         root_pos = self.initial_right_pos.clone()
         root_pos[:, 0] += right_door
-        self._right_door.set_world_poses(root_pos[:], self.initial_root_rot[:].clone())
+        self._right_door.set_world_poses(root_pos[:], self.initial_root_rot[:].clone(), indices=env_ids)
 
 
     # def post_physics_step(self):
