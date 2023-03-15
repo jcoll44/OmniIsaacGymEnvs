@@ -97,9 +97,9 @@ class JackalTask(RLTask):
         self._noise_amount = self._task_cfg["env"]["noiseAmount"]
 
         self._num_observations = 5
-        self._num_actions = 5
+        self._num_actions = 2
 
-        self.action_space = spaces.Discrete(self._num_actions)
+        # self.action_space = spaces.Discrete(self._num_actions)
 
 
 
@@ -116,7 +116,7 @@ class JackalTask(RLTask):
             self._action_array = torch.zeros([self._num_envs, round(self._noise_amount/self._dt), 2], dtype=torch.float , device=self.device)
 
 
-        self.action_space = spaces.Discrete(self._num_actions)
+        # self.action_space = spaces.Discrete(self._num_actions)
 
 
         return
@@ -234,43 +234,53 @@ class JackalTask(RLTask):
             self.reset_idx(reset_env_ids)
 
 
-        # Discretised Actions
-        if actions.ndim > 1: #for some reason the first action is always 2 dimensional...
-            actions = actions[:,0]
-        else:
-            actions = actions
+
         actions = actions.to(self._device)
-
-        # From integers to continuous linear and angular velocities
-        body_velocities = torch.zeros((self._jackals.count, 2), dtype=torch.float32, device=self._device)
-        # linear velocity
-        # linear velocity
-        body_velocities[:,0] = torch.where(actions == 0 , 2.0, 0.0)
-        body_velocities[:,0] = torch.where(actions == 1, 1.0, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 2, 1.0, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 3 , -2.0, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 4 , 0.0, body_velocities[:,0])
-        # angular velocity
-        body_velocities[:,1] = torch.where(actions == 1, 30.0, 0.0)
-        body_velocities[:,1] = torch.where(actions == 2, -30.0, body_velocities[:,1])
-
-        # Save to an array to add noise
-        # self._action_array[:,-1,0] = body_velocities[:,0]
-        # self._action_array[:,-1,1] = body_velocities[:,1]
-
+        actions = torch.where(actions > 1.0, (actions-1)*-1, actions)
 
         velocity = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
-        # velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
-        # velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
-
-
-        velocity[:,0],velocity[:,1] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1]) #used when not considering noise
-        velocity[:,2],velocity[:,3] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1])
+        velocity[:,0],velocity[:,1] = self.wheel_velocities(actions[:,0]*2,actions[:,1]*30)
+        velocity[:,2],velocity[:,3] = self.wheel_velocities(actions[:,0]*2,actions[:,1]*30)
 
         indices = torch.arange(self._jackals.count, dtype=torch.int32, device=self._device)
         self._jackals.set_joint_velocity_targets(velocity, indices=indices)
 
-        self._action_array[:,0:-1,:] = self._action_array[:,1:,:]
+
+
+        # # Discretised Actions
+        # if actions.ndim > 1: #for some reason the first action is always 2 dimensional...
+        #     actions = actions[:,0]
+        # else:
+        #     actions = actions
+        # actions = actions.to(self._device)
+
+        # # From integers to continuous linear and angular velocities
+        # body_velocities = torch.zeros((self._jackals.count, 2), dtype=torch.float32, device=self._device)
+        # # linear velocity
+        # # linear velocity
+        # body_velocities[:,0] = torch.where(actions == 0 , 2.0, 0.0)
+        # body_velocities[:,0] = torch.where(actions == 1, 1.0, body_velocities[:,0])
+        # body_velocities[:,0] = torch.where(actions == 2, 1.0, body_velocities[:,0])
+        # body_velocities[:,0] = torch.where(actions == 3 , -2.0, body_velocities[:,0])
+        # body_velocities[:,0] = torch.where(actions == 4 , 0.0, body_velocities[:,0])
+        # # angular velocity
+        # body_velocities[:,1] = torch.where(actions == 1, 30.0, 0.0)
+        # body_velocities[:,1] = torch.where(actions == 2, -30.0, body_velocities[:,1])
+        # # Save to an array to add noise
+        # # self._action_array[:,-1,0] = body_velocities[:,0]
+        # # self._action_array[:,-1,1] = body_velocities[:,1]
+        # velocity = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
+        # # velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
+        # # velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
+
+
+        # velocity[:,0],velocity[:,1] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1]) #used when not considering noise
+        # velocity[:,2],velocity[:,3] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1])
+
+        # indices = torch.arange(self._jackals.count, dtype=torch.int32, device=self._device)
+        # self._jackals.set_joint_velocity_targets(velocity, indices=indices)
+
+        # self._action_array[:,0:-1,:] = self._action_array[:,1:,:]
 
 
 
