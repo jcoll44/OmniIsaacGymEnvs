@@ -148,8 +148,9 @@ def parse_hydra_configs(cfg: DictConfig):
     LEFT = LEFT.flatten()
     RIGHT = RIGHT.flatten()
 
-    # environmnents = np.vstack((X,Y,YAW,LEFT,RIGHT)).T
+    environmnents = np.vstack((X,Y,YAW,LEFT,RIGHT)).T
     print(X.shape)
+    print(environments)
 
     
 
@@ -169,6 +170,7 @@ def parse_hydra_configs(cfg: DictConfig):
                     obs = env._world.reset(soft=True)
                     env._task.set_start_state(X, Y, YAW, LEFT, RIGHT)
                 obs = env._task.get_observations()["jackal_view"]["obs_buf"]
+                if env.sim_frame_count == 0: print(obs)
                 obs = obs.view(cfg.num_envs, -1)
                 # actions = torch.tensor(np.array([env.action_space.sample() for _ in range(env.num_envs)]), device=task.rl_device)
                 actions = agent.get_action(obs)
