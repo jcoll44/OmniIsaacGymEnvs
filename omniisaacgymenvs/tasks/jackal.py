@@ -35,7 +35,9 @@ from omni.isaac.core.articulations import ArticulationView
 from omni.isaac.core.utils.prims import get_prim_at_path
 from omni.isaac.core.prims import RigidPrimView
 from omni.isaac.core.objects import DynamicCuboid, DynamicSphere
-
+import omni.replicator.core as rep
+from omni.replicator.isaac.scripts.writers.pytorch_listener import PytorchListener
+from omni.replicator.isaac.scripts.writers.pytorch_writer import PytorchWriter
 import omni
 
 from omni.isaac.core.utils.prims import get_prim_at_path
@@ -101,6 +103,8 @@ class JackalTask(RLTask):
 
         self.action_space = spaces.Discrete(self._num_actions)
 
+        self.render_image = self._task_cfg["env"]["renderImages"]
+
 
 
         RLTask.__init__(self, name, env)
@@ -135,7 +139,7 @@ class JackalTask(RLTask):
         scene.add(self._walls)
         scene.add(self._left_door)
         scene.add(self._right_door)
-        # scene.add_ground_plane(size=200.0, color=torch.tensor([0.01,0.01,0.01]))
+        scene.add_ground_plane(size=200.0, color=torch.tensor([0.01,0.01,0.01]))
 
         self.root_pos, self.root_rot = self._jackals.get_world_poses(clone=False)
         # self.dof_pos = self._jackals.get_joint_positions(clone=False)
@@ -146,6 +150,21 @@ class JackalTask(RLTask):
         self.initial_root_pos, self.initial_root_rot = self.root_pos.clone(), self.root_rot.clone()
         self.initial_left_pos, self.initial_left_rot = self.left_root_pos.clone(), self.left_root_rot.clone()
         self.initial_right_pos, self.initial_right_rot = self.right_root_pos.clone(), self.right_root_rot.clone()
+
+        if self.render_image:
+            if self._num_envs < 10:
+                render_products = []
+                print("Creating render products")
+                for i in range(self.num_envs):
+                    camera= rep.create.camera(position=(self.root_pos[i,:].cpu().numpy() + np.array([0.0,-3.0,6.0])), rotation=(0.0,-50.0,-90))
+                    rp = rep.create.render_product(camera,resolution=(512,512))
+                    render_products.append(rp)
+
+                self.listener = PytorchListener()
+                rep.WriterRegistry.register(PytorchWriter)
+                self.writer = rep.WriterRegistry.get("PytorchWriter")
+                self.writer.initialize(listener=self.listener,device=self.device)
+                self.writer.attach(render_products)
 
         return
 
@@ -400,8 +419,8 @@ class JackalTask(RLTask):
         jackal_yaw = torch.tensor(jackal_yaw, dtype=torch.float, device=self.device)
         left_door = torch.tensor(left_door, dtype=torch.float, device=self.device)
         right_door = torch.tensor(right_door, dtype=torch.float, device=self.device)
-
-        env_ids = [i for i in range(len(jackal_yaw))]
+        print(jackal_yaw.shape)
+        env_ids = [i for i in range(jackal_yaw.shape[0])]
         new_jackal_rot = quat_from_angle_axis(jackal_yaw, self.z_unit_tensor[env_ids])
 
         root_pos = self.initial_root_pos.clone()
@@ -420,7 +439,12 @@ class JackalTask(RLTask):
         root_pos[:, 0] += right_door
         self._right_door.set_world_poses(root_pos[:], self.initial_root_rot[:].clone(), indices=env_ids)
 
+        # bookkeeping
+        self.reset_buf[env_ids] = 0
+        self.progress_buf[env_ids] = 0
 
+    def get_image(self,):
+        return self.listener.get_rgb_data()
     # def post_physics_step(self):
     #     self.progress_buf[:] += 1
 
