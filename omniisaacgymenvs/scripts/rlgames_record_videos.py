@@ -65,8 +65,8 @@ def parse_hydra_configs(cfg: DictConfig):
     cfg_dict = omegaconf_to_dict(cfg)
     print_dict(cfg_dict)
 
-    headless = False
-    render = not headless
+    headless = True
+    render = True
 
     env = VecEnvRLGames(headless=headless, sim_device=cfg.device_id)
     task = initialize_task(cfg_dict, env)
@@ -155,7 +155,8 @@ def parse_hydra_configs(cfg: DictConfig):
                 if env.sim_frame_count == 0:
                     # obs = env._world.reset(soft=True)
                     env._task.set_start_state(np.expand_dims(X[i],0), np.expand_dims(Y[i],0), np.expand_dims(YAW[i],0), np.expand_dims(LEFT[i],0), np.expand_dims(RIGHT[i],0))
-                    env._world.step(render=render)
+                    for j in range(10):
+                        env._world.step(render=render)
                 obs = env._task.get_observations()["jackal_view"]["obs_buf"]
                 obs = obs.view(cfg.num_envs, -1)
                 # actions = torch.tensor(np.array([env.action_space.sample() for _ in range(env.num_envs)]), device=task.rl_device)
@@ -208,7 +209,7 @@ def save_video(video, filepath):
     filename = "vid.mp4"
     # Define the codec and create VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(filepath+filename, fourcc, 40.0, (512, 512))
+    out = cv2.VideoWriter(filepath+filename, fourcc, 40.0, (700, 700))
 
     for frame in video:
         frame = np.moveaxis(frame, 0, -1)

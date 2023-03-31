@@ -10,7 +10,7 @@ env:
   envSpacing: 8.0
   resetDist: 3.0
   maxEffort: 400.0
-  maxEpisodeLength: 30 #1500
+  maxEpisodeLength: 500 #1500
 
   noiseAmount: 0.0
 

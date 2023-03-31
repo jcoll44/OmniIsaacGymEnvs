@@ -157,7 +157,7 @@ class JackalTask(RLTask):
                 print("Creating render products")
                 for i in range(self.num_envs):
                     camera= rep.create.camera(position=(self.root_pos[i,:].cpu().numpy() + np.array([0.0,-3.0,6.0])), rotation=(0.0,-50.0,-90))
-                    rp = rep.create.render_product(camera,resolution=(512,512))
+                    rp = rep.create.render_product(camera,resolution=(700,700))
                     render_products.append(rp)
 
                 self.listener = PytorchListener()

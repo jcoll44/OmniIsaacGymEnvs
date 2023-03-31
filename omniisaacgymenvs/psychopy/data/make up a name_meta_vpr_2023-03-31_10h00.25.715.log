@@ -1,0 +1,110 @@
+0.3107 	WARNING 	Speech-to-text recognition module for PocketSphinx is not available (use command `pip install SpeechRecognition` to get it). Transcription will be unavailable using that service this session.
+0.3107 	WARNING 	Speech-to-text recognition using Google online services is not available (use command `pip install google-api-core google-auth google-cloud google-cloud-speech googleapis-common-protos` to get it). Transcription will be unavailable using that service this session.
+0.4661 	WARNING 	We strongly recommend you activate the PTB sound engine in PsychoPy prefs as the preferred audio engine. Its timing is vastly superior. Your prefs are currently set to use ['sounddevice', 'PTB', 'pyo', 'pygame'] (in that order).
+3.1523 	WARNING 	User requested fullscreen with size [1440  900], but screen is actually [2560, 1440]. Using actual size
+3.7645 	EXP 	Created window1 = Window(allowGUI=True, allowStencil=False, autoLog=True, backendConf=UNKNOWN, bitsMode=UNKNOWN, blendMode='avg', bpc=(8, 8, 8), color=array([0, 0, 0]), colorSpace='rgb', depthBits=8, fullscr=<method-wrapper '__getattribute__' of attributeSetter object at 0x7fcec62111f0>, gamma=None, gammaErrorPolicy='raise', lms=UNKNOWN, monitor=<psychopy.monitors.calibTools.Monitor object at 0x7fcec443a400>, multiSample=False, name='window1', numSamples=2, pos=[0.0, 0.0], screen=0, size=array([2560, 1440]), stencilBits=0, stereo=False, units='height', useFBO=True, useRetina=False, viewOri=0.0, viewPos=None, viewScale=None, waitBlanking=True, winType='pyglet')
+3.7648 	EXP 	window1: mouseVisible = True
+3.7670 	EXP 	window1: mouseVisible = False
+3.7671 	EXP 	window1: Attempting to measure frame rate of screen (0) ...
+3.7671 	EXP 	window1: recordFrameIntervals = False
+3.9341 	EXP 	window1: recordFrameIntervals = True
+4.1108 	EXP 	Screen (0) actual frame rate measured at 59.89Hz
+4.1109 	EXP 	window1: recordFrameIntervals = False
+4.1735 	EXP 	Created text_inst = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoDraw=False, autoLog=True, bold=False, color=array([1, 1, 1]), colorSpace='rgb', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Open Sans', fontFiles=[], height=0.05, italic=False, languageStyle='LTR', name='text_inst', opacity=1.0, ori=0.0, pos=array([0., 0.]), rgb=UNKNOWN, text=str(...), units='height', win=Window(...), wrapWidth=1)
+4.1764 	EXP 	Created fixate_middle = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoDraw=False, autoLog=True, bold=False, color=array([1, 1, 1]), colorSpace='rgb', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Open Sans', fontFiles=[], height=0.1, italic=False, languageStyle='LTR', name='fixate_middle', opacity=1.0, ori=0.0, pos=array([0., 0.]), rgb=UNKNOWN, text='+', units='height', win=Window(...), wrapWidth=1)
+4.1770 	EXP 	Created text = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoDraw=False, autoLog=True, bold=False, color=array([1, 1, 1]), colorSpace='rgb', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Open Sans', fontFiles=[], height=0.05, italic=False, languageStyle='LTR', name='text', opacity=1.0, ori=0.0, pos=array([0., 0.]), rgb=UNKNOWN, text='', units='height', win=Window(...), wrapWidth=1)
+4.1957 	EXP 	Created Goal_reached = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoDraw=False, autoLog=True, bold=False, color=array([1, 1, 1]), colorSpace='rgb', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Open Sans', fontFiles=[], height=0.05, italic=False, languageStyle='LTR', name='Goal_reached', opacity=1.0, ori=0.0, pos=array([0., 0.]), rgb=UNKNOWN, text=str(...), units='height', win=Window(...), wrapWidth=1)
+4.2008 	EXP 	Created text_mid = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoDraw=False, autoLog=True, bold=False, color=array([1, 1, 1]), colorSpace='rgb', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Open Sans', fontFiles=[], height=0.05, italic=False, languageStyle='LTR', name='text_mid', opacity=1.0, ori=0.0, pos=array([0., 0.]), rgb=UNKNOWN, text=str(...), units='height', win=Window(...), wrapWidth=1)
+4.2020 	EXP 	Created fixate_middle = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoDraw=False, autoLog=True, bold=False, color=array([1, 1, 1]), colorSpace='rgb', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Open Sans', fontFiles=[], height=0.1, italic=False, languageStyle='LTR', name='fixate_middle', opacity=1.0, ori=0.0, pos=array([0., 0.]), rgb=UNKNOWN, text='+', units='height', win=Window(...), wrapWidth=1)
+4.2025 	EXP 	Created text = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoDraw=False, autoLog=True, bold=False, color=array([1, 1, 1]), colorSpace='rgb', contrast=1.0, depth=-1.0, flipHoriz=False, flipVert=False, font='Open Sans', fontFiles=[], height=0.05, italic=False, languageStyle='LTR', name='text', opacity=1.0, ori=0.0, pos=array([0., 0.]), rgb=UNKNOWN, text='', units='height', win=Window(...), wrapWidth=1)
+4.2062 	EXP 	Created image = ImageStim(__class__=<class 'psychopy.visual.image.ImageStim'>, anchor=('center', 'center'), autoLog=True, color=array([1, 1, 1]), colorSpace='rgb', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, image='sin', interpolate=True, mask=None, maskParams=None, name='image', opacity=1.0, ori=0.0, pos=array([0., 0.]), size=array([0.5, 0.5]), texRes=128.0, units='height', win=Window(...))
+4.2088 	EXP 	Created Question = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoDraw=False, autoLog=True, bold=False, color=array([1, 1, 1]), colorSpace='rgb', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Open Sans', fontFiles=[], height=0.05, italic=False, languageStyle='LTR', name='Question', opacity=1.0, ori=0.0, pos=array([0., 0.]), rgb=UNKNOWN, text=str(...), units='height', win=Window(...), wrapWidth=1)
+4.2180 	EXP 	Created text_confidence = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoDraw=False, autoLog=True, bold=False, color=array([1, 1, 1]), colorSpace='rgb', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Open Sans', fontFiles=[], height=0.05, italic=False, languageStyle='LTR', name='text_confidence', opacity=1.0, ori=0.0, pos=array([0., 0.]), rgb=UNKNOWN, text=str(...), units='height', win=Window(...), wrapWidth=1)
+4.2219 	EXP 	Created text_thanks = TextStim(__class__=<class 'psychopy.visual.text.TextStim'>, alignHoriz=method-wrapper(...), alignText='center', alignVert=method-wrapper(...), anchorHoriz='center', anchorVert='center', antialias=True, autoDraw=False, autoLog=True, bold=False, color=array([1, 1, 1]), colorSpace='rgb', contrast=1.0, depth=0.0, flipHoriz=False, flipVert=False, font='Open Sans', fontFiles=[], height=0.05, italic=False, languageStyle='LTR', name='text_thanks', opacity=1.0, ori=0.0, pos=array([0., 0.]), rgb=UNKNOWN, text=str(...), units='height', win=Window(...), wrapWidth=1)
+4.2322 	EXP 	text_inst: autoDraw = True
+4.6197 	DATA 	Mouse: Left button down, pos=(1181,874)
+4.7533 	DATA 	Mouse:  Left button up, pos=(1182,874)
+5.7925 	EXP 	Imported vpr_stimuli1.xlsx as conditions, 10 conditions, 9 params
+5.7929 	EXP 	Created sequence: sequential, trialTypes=10, nReps=1, seed=None
+5.7931 	EXP 	New trial (rep=0, index=0): {'number': 101, 'id': 432, 'video': '../recordings/100/vid.mp4', 'img': None, 'match': 0, 'NOTES': 'new, old', 'debug': 'mismatch', 'type': 'practice', 'note': "PRACTICE: These are 'different' places"}
+5.7938 	DATA 	Keypress: space
+5.8029 	EXP 	text_inst: autoDraw = False
+5.8029 	EXP 	text: autoDraw = True
+6.2165 	EXP 	fixate_middle: autoDraw = True
+6.3148 	EXP 	text: autoDraw = False
+6.8011 	EXP 	fixate_middle: autoDraw = False
+6.8011 	EXP 	fixate_middle: autoDraw = False
+6.8011 	EXP 	text: autoDraw = False
+13.7471 	EXP 	Goal_reached: autoDraw = True
+15.2787 	DATA 	Keypress: y
+15.2900 	EXP 	New trial (rep=0, index=1): {'number': 102, 'id': 52, 'video': '../recordings/150/vid.mp4', 'img': None, 'match': 1, 'NOTES': 'new, old', 'debug': 'match', 'type': 'practice', 'note': "PRACTICE: These are the 'same' place"}
+15.3057 	EXP 	Goal_reached: autoDraw = False
+15.3057 	EXP 	text: autoDraw = True
+15.8037 	EXP 	fixate_middle: autoDraw = True
+15.8195 	EXP 	text: autoDraw = False
+16.3596 	EXP 	fixate_middle: autoDraw = False
+16.3596 	EXP 	fixate_middle: autoDraw = False
+16.3596 	EXP 	text: autoDraw = False
+23.3381 	EXP 	Goal_reached: autoDraw = True
+24.7197 	DATA 	Keypress: n
+24.7313 	EXP 	New trial (rep=0, index=2): {'number': None, 'id': None, 'video': '../recordings/200/vid.mp4', 'img': None, 'match': None, 'NOTES': None, 'debug': None, 'type': None, 'note': None}
+24.7468 	EXP 	Goal_reached: autoDraw = False
+24.7468 	EXP 	text: autoDraw = True
+25.2474 	EXP 	fixate_middle: autoDraw = True
+25.2474 	EXP 	text: autoDraw = False
+25.7989 	EXP 	fixate_middle: autoDraw = False
+25.7989 	EXP 	fixate_middle: autoDraw = False
+25.7989 	EXP 	text: autoDraw = False
+32.7398 	EXP 	Goal_reached: autoDraw = True
+33.9556 	EXP 	New trial (rep=0, index=3): {'number': None, 'id': None, 'video': '../recordings/250/vid.mp4', 'img': None, 'match': None, 'NOTES': None, 'debug': None, 'type': None, 'note': None}
+33.9608 	DATA 	Keypress: y
+33.9709 	EXP 	Goal_reached: autoDraw = False
+33.9709 	EXP 	text: autoDraw = True
+34.4687 	EXP 	fixate_middle: autoDraw = True
+34.4853 	EXP 	text: autoDraw = False
+35.0192 	EXP 	fixate_middle: autoDraw = False
+35.0192 	EXP 	fixate_middle: autoDraw = False
+35.0192 	EXP 	text: autoDraw = False
+41.9982 	EXP 	Goal_reached: autoDraw = True
+42.6129 	EXP 	New trial (rep=0, index=4): {'number': None, 'id': None, 'video': '../recordings/300/vid.mp4', 'img': None, 'match': None, 'NOTES': None, 'debug': None, 'type': None, 'note': None}
+42.6183 	DATA 	Keypress: n
+42.6280 	EXP 	Goal_reached: autoDraw = False
+42.6280 	EXP 	text: autoDraw = True
+43.1262 	EXP 	fixate_middle: autoDraw = True
+43.1438 	EXP 	text: autoDraw = False
+43.6746 	EXP 	fixate_middle: autoDraw = False
+43.6746 	EXP 	fixate_middle: autoDraw = False
+43.6746 	EXP 	text: autoDraw = False
+50.6548 	EXP 	Goal_reached: autoDraw = True
+51.6707 	EXP 	New trial (rep=0, index=5): {'number': None, 'id': None, 'video': '../recordings/350/vid.mp4', 'img': None, 'match': None, 'NOTES': None, 'debug': None, 'type': None, 'note': None}
+51.6755 	DATA 	Keypress: n
+51.6858 	EXP 	Goal_reached: autoDraw = False
+51.6858 	EXP 	text: autoDraw = True
+52.1834 	EXP 	fixate_middle: autoDraw = True
+52.2002 	EXP 	text: autoDraw = False
+52.7411 	EXP 	fixate_middle: autoDraw = False
+52.7411 	EXP 	fixate_middle: autoDraw = False
+52.7411 	EXP 	text: autoDraw = False
+59.7245 	EXP 	Goal_reached: autoDraw = True
+61.7949 	EXP 	New trial (rep=0, index=6): {'number': None, 'id': None, 'video': '../recordings/400/vid.mp4', 'img': None, 'match': None, 'NOTES': None, 'debug': None, 'type': None, 'note': None}
+61.8007 	DATA 	Keypress: n
+61.8109 	EXP 	Goal_reached: autoDraw = False
+61.8109 	EXP 	text: autoDraw = True
+62.2945 	EXP 	fixate_middle: autoDraw = True
+62.3118 	EXP 	text: autoDraw = False
+62.8545 	EXP 	fixate_middle: autoDraw = False
+62.8545 	EXP 	fixate_middle: autoDraw = False
+62.8545 	EXP 	text: autoDraw = False
+69.8313 	EXP 	Goal_reached: autoDraw = True
+70.7705 	EXP 	New trial (rep=0, index=7): {'number': None, 'id': None, 'video': '../recordings/450/vid.mp4', 'img': None, 'match': None, 'NOTES': None, 'debug': None, 'type': None, 'note': None}
+70.7747 	DATA 	Keypress: n
+70.7851 	EXP 	Goal_reached: autoDraw = False
+70.7851 	EXP 	text: autoDraw = True
+71.2858 	EXP 	fixate_middle: autoDraw = True
+71.2858 	EXP 	text: autoDraw = False
+71.8468 	EXP 	fixate_middle: autoDraw = False
+71.8468 	EXP 	fixate_middle: autoDraw = False
+71.8468 	EXP 	text: autoDraw = False
+78.8279 	EXP 	Goal_reached: autoDraw = True
+80.5329 	DATA 	Keypress: escape
+80.6194 	EXP 	window1: mouseVisible = True
