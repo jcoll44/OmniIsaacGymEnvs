@@ -17,7 +17,7 @@ env:
   clipActions: 5.0
   controlFrequencyInv: 2 # 60 Hz
 
-  renderImages: True
+  renderImages: False
 
 sim:
   dt: 0.01 # 1/120 s
@@ -85,7 +85,8 @@ sim:
   Wall:
     # -1 to use default values
     override_usd_defaults: False
-    fixed_base: True
+    # fixed_base: True
+    make_kinematic: True
     enable_self_collisions: False
     enable_gyroscopic_forces: True
     # also in stage params
@@ -104,7 +105,8 @@ sim:
   Left_Door:
     # -1 to use default values
     override_usd_defaults: True
-    fixed_base: True
+    # fixed_base: True
+    make_kinematic: True
     enable_self_collisions: False
     enable_gyroscopic_forces: True
     # also in stage params
@@ -123,7 +125,8 @@ sim:
   Right_Door:
     # -1 to use default values
     override_usd_defaults: True
-    fixed_base: True
+    # fixed_base: True
+    make_kinematic: True
     enable_self_collisions: False
     enable_gyroscopic_forces: True
     # also in stage params

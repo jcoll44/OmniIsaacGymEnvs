@@ -71,6 +71,7 @@ params:
     full_experiment_name: ${.name}
     device: ${....rl_device}
     device_name: ${....rl_device}
+    multi_gpu: ${....multi_gpu}
     env_name: rlgpu
     ppo: True
     mixed_precision: True

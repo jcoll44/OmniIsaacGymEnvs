@@ -49,18 +49,6 @@ import numpy as np
 import torch
 import math
 
-"""
-1. Add noise/delayed actions at will. Only 1 delay is required
-2. Allow test points to be assessed at will
-3. 
-"""
-"""
-Process
-1. Train an agent in an environment without noise
-2. Assess the metacognitive ability of CCBP at set start states - the dataset for creating the CCBP must be the same as the training one.
-3. Save a dataset for training a classifier using the training environment data
-4. Assess the classifier at the set start states like CCBP
-"""
 
 """
 docker run --name isaac-sim --entrypoint bash -it --gpus all -e "ACCEPT_EULA=Y" --rm --network=host     -v /usr/share/vulkan/icd.d/nvidia_icd.json:/etc/vulkan/icd.d/nvidia_icd.json     -v /usr/share/vulkan/implicit_layer.d/nvidia_layers.json:/etc/vulkan/implicit_layer.d/nvidia_layers.json     -v /usr/share/glvnd/egl_vendor.d/10_nvidia.json:/usr/share/glvnd/egl_vendor.d/10_nvidia.json     -v ~/docker/isaac-sim/cache/ov:/root/.cache/ov:rw     -v ~/docker/isaac-sim/cache/pip:/root/.cache/pip:rw     -v ~/docker/isaac-sim/cache/glcache:/root/.cache/nvidia/GLCache:rw     -v ~/docker/isaac-sim/cache/computecache:/root/.nv/ComputeCache:rw     -v ~/docker/isaac-sim/logs:/root/.nvidia-omniverse/logs:rw     -v ~/docker/isaac-sim/config:/root/.nvidia-omniverse/config:rw     -v ~/docker/isaac-sim/data:/root/.local/share/ov/data:rw     -v ~/docker/isaac-sim/documents:/root/Documents:rw  -v ~/Documents/:/home/Documents   nvcr.io/nvidia/isaac-sim:2022.2.0
@@ -445,44 +433,4 @@ class JackalTask(RLTask):
 
     def get_image(self,):
         return self.listener.get_rgb_data()
-    # def post_physics_step(self):
-    #     self.progress_buf[:] += 1
 
-    #     # self.refresh_dof_state_tensors()
-    #     # self.refresh_body_state_tensors()
-
-    #     # self.update_selected_object()
-
-    #     # self.common_step_counter += 1
-    #     # if self.common_step_counter % self.push_interval == 0:
-    #     #     self.push_robots()
-        
-    #     # prepare quantities
-    #     # self.base_lin_vel = quat_rotate_inverse(self.base_quat, self.base_velocities[:, 0:3])
-    #     # self.base_ang_vel = quat_rotate_inverse(self.base_quat, self.base_velocities[:, 3:6])
-    #     # self.projected_gravity = quat_rotate_inverse(self.base_quat, self.gravity_vec)
-    #     # forward = quat_apply(self.base_quat, self.forward_vec)
-    #     # heading = torch.atan2(forward[:, 1], forward[:, 0])
-    #     # self.commands[:, 2] = torch.clip(0.5*wrap_to_pi(self.commands[:, 3] - heading), -1., 1.)
-
-    #     # self.check_termination()
-
-    #     # if self._selected_id is not None:
-    #     #     self.commands[self._selected_id, :] = torch.tensor(self._current_command, device=self.device)
-    #     #     self.timeout_buf[self._selected_id] = 0
-    #     #     self.reset_buf[self._selected_id] = 0
-
-    #     # self.get_states()
-
-    #     env_ids = self.reset_buf.nonzero(as_tuple=False).flatten()
-    #     if len(env_ids) > 0:
-    #         self.reset_idx(env_ids)
-
-    #     self.get_observations()
-    #     # if self.add_noise:
-    #     #     self.obs_buf += (2 * torch.rand_like(self.obs_buf) - 1) * self.noise_scale_vec
-
-    #     # self.last_actions[:] = self.actions[:]
-    #     # self.last_dof_vel[:] = self.dof_vel[:]
-
-    #     return self.obs_buf, self.rew_buf, self.reset_buf, self.extras
