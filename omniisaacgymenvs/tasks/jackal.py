@@ -268,14 +268,14 @@ class JackalTask(RLTask):
         body_velocities = torch.zeros((self._jackals.count, 2), dtype=torch.float32, device=self._device)
         # linear velocity
         # linear velocity
-        body_velocities[:,0] = torch.where(actions == 0 , 2.0, 0.0)
-        body_velocities[:,0] = torch.where(actions == 1, 1.0, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 2, 1.0, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 3 , -2.0, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 0 , 1.0, 0.0)
+        body_velocities[:,0] = torch.where(actions == 1, 0.5, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 2, 0.5, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 3 , -1.0, body_velocities[:,0])
         body_velocities[:,0] = torch.where(actions == 4 , 0.0, body_velocities[:,0])
         # angular velocity
-        body_velocities[:,1] = torch.where(actions == 1, 30.0, 0.0)
-        body_velocities[:,1] = torch.where(actions == 2, -30.0, body_velocities[:,1])
+        body_velocities[:,1] = torch.where(actions == 1, 15.0, 0.0)
+        body_velocities[:,1] = torch.where(actions == 2, -15.0, body_velocities[:,1])
         # Save to an array to add noise
         # self._action_array[:,-1,0] = body_velocities[:,0]
         # self._action_array[:,-1,1] = body_velocities[:,1]
@@ -355,7 +355,7 @@ class JackalTask(RLTask):
 
         dist = ((jackal_pos-self.target_position[0:2])**2).sum(axis=1)
         reward1 = torch.exp(dist/10)*-1
-        reward2 = torch.where(torch.abs(dist) < 0.5, 100, reward1)
+        reward2 = torch.where(torch.abs(dist) < 0.2, 100, reward1)
         reward = reward2
 
 
@@ -373,7 +373,7 @@ class JackalTask(RLTask):
 
         # pole_pos = self.obs_buf[:, 2]
 
-        resets = torch.where(torch.abs(dist) < 0.5, 1, 0)
+        resets = torch.where(torch.abs(dist) < 0.2, 1, 0)
         resets = torch.where(self.progress_buf >= self._max_episode_length - 1, torch.ones_like(self.reset_buf), resets)
 
         # original code from Raunak on how to calculate termination state
