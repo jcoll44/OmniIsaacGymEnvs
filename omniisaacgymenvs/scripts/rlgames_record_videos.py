@@ -121,13 +121,12 @@ def parse_hydra_configs(cfg: DictConfig):
     # print(len(experience.successful_states))
 
 
-
     # Create the assessment environment
-    x_init_space = np.linspace(-1.5,1.5, 5)
-    y_init_space = np.linspace(-0.3, 0.2, 5) # y pos is -2 + this offset
-    yaw_init_space = np.linspace(0.0, 3.14, 3) 
-    left_door_init_space = np.linspace(-0.2,0.3,3) #left door x is -1 + this offset
-    right_door_init_space = np.linspace(-0.3,0.5,3) # right door x is 1 + this offset
+    x_init_space = np.linspace(-1.5,1.5, 2)
+    y_init_space = np.linspace(-0.3, 0.2, 4) # y pos is -2 + this offset
+    yaw_init_space = np.linspace(3.14*1/4, 3.14*3/4, 3) 
+    left_door_init_space = np.linspace(-0.2,0.2,2) #left door x is -1 + this offset
+    right_door_init_space = np.linspace(-0.2,0.2,2) # right door x is 1 + this offset
 
     X, Y, YAW, LEFT, RIGHT = np.meshgrid(x_init_space, y_init_space, yaw_init_space, left_door_init_space, right_door_init_space)
 
