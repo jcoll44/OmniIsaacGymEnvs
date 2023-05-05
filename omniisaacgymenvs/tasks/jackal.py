@@ -57,7 +57,7 @@ cd /home/Documents/OmniIsaacGymEnvs/
 PYTHON_PATH -m pip install -e .
 PYTHON_PATH -m pip install wandb
 cd omniisaacgymenvs
-PYTHON_PATH scripts/rlgames_train.py task=Jackal headless=True wandb_activate=True wandb_project=Jackal_Meta wandb_entity=jcoll44
+PYTHON_PATH scripts/rlgames_train.py task=Jackal headless=True wandb_activate=True wandb_project=Jackal_Meta wandb_entity=jcoll44 enable_livestream=True
 """
 
 
@@ -268,14 +268,14 @@ class JackalTask(RLTask):
         body_velocities = torch.zeros((self._jackals.count, 2), dtype=torch.float32, device=self._device)
         # linear velocity
         # linear velocity
-        body_velocities[:,0] = torch.where(actions == 0 , 1.0, 0.0)
-        body_velocities[:,0] = torch.where(actions == 1, 0.5, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 2, 0.5, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 3 , -1.0, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 0 , 1.5, 0.0)
+        body_velocities[:,0] = torch.where(actions == 1, 0.80, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 2, 0.80, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 3 , -1.5, body_velocities[:,0])
         body_velocities[:,0] = torch.where(actions == 4 , 0.0, body_velocities[:,0])
         # angular velocity
-        body_velocities[:,1] = torch.where(actions == 1, 15.0, 0.0)
-        body_velocities[:,1] = torch.where(actions == 2, -15.0, body_velocities[:,1])
+        body_velocities[:,1] = torch.where(actions == 1, 20.0, 0.0)
+        body_velocities[:,1] = torch.where(actions == 2, -20.0, body_velocities[:,1])
         # Save to an array to add noise
         # self._action_array[:,-1,0] = body_velocities[:,0]
         # self._action_array[:,-1,1] = body_velocities[:,1]
@@ -310,13 +310,13 @@ class JackalTask(RLTask):
         self._jackals.set_world_poses(root_pos[env_ids], new_jackal_rot, indices=env_ids)
 
         root_pos = self.initial_left_pos.clone()
-        root_pos[env_ids, 0] += torch_rand_float(-0.2,0.3, (num_resets, 1), device=self._device).view(-1)
+        root_pos[env_ids, 0] += torch_rand_float(-0.3,0.3, (num_resets, 1), device=self._device).view(-1)
         # root_pos[env_ids, 2] += 0.01
 
         self._left_door.set_world_poses(root_pos[env_ids], self.initial_root_rot[env_ids].clone(), indices=env_ids)
 
         root_pos = self.initial_right_pos.clone()
-        root_pos[env_ids, 0] += torch_rand_float(-0.3,0.5, (num_resets, 1), device=self._device).view(-1)
+        root_pos[env_ids, 0] += torch_rand_float(-0.3,0.3, (num_resets, 1), device=self._device).view(-1)
         # root_pos[env_ids, 2] += 0.01
 
         self._right_door.set_world_poses(root_pos[env_ids], self.initial_root_rot[env_ids].clone(), indices=env_ids)
