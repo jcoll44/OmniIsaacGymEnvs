@@ -134,19 +134,26 @@ def parse_hydra_configs(cfg: DictConfig):
         # Create the assessment environment
         num_points = 100
 
-        # Determine the number of sample points along each axis
-        num_points_x = int(round(num_points ** (1/5)))
-        num_points_y = int(round(num_points ** (1/5)))
-        num_points_yaw = int(round(num_points ** (1/5)))
-        num_points_left_door = int(round(num_points ** (1/5)))
-        num_points_right_door = num_points // (num_points_x * num_points_y * num_points_yaw * num_points_left_door)
-        print("Number of points along each axis: ", num_points_x, num_points_y, num_points_yaw, num_points_left_door, num_points_right_door)
 
-        x_init_space = np.linspace(x_lower_array[environment],x_upper_array[environment], num_points_x)
-        y_init_space = np.linspace(y_lower_array[environment],y_upper_array[environment], num_points_y) # y pos is -2 + this offset
-        yaw_init_space = np.linspace(yaw_lower_array[environment],yaw_upper_array[environment], num_points_yaw) 
-        left_door_init_space = np.linspace(left_door_lower_array[environment],left_door_upper_array[environment], num_points_left_door) #left door x is -1 + this offset
-        right_door_init_space = np.linspace(right_door_lower_array[environment],right_door_upper_array[environment], num_points_right_door) # right door x is 1 + this offset
+        # Determine the number of points along each axis
+        n = round(num_points ** (1/5))
+        if n**5 > num_points:
+            n = n-1
+
+
+        # Determine the number of sample points along each axis
+        # num_points_x = int(round(num_points ** (1/5)))
+        # num_points_y = int(round(num_points ** (1/5)))
+        # num_points_yaw = int(round(num_points ** (1/5)))
+        # num_points_left_door = int(round(num_points ** (1/5)))
+        # num_points_right_door = num_points // (num_points_x * num_points_y * num_points_yaw * num_points_left_door)
+        # print("Number of points along each axis: ", num_points_x, num_points_y, num_points_yaw, num_points_left_door, num_points_right_door)
+
+        x_init_space = np.linspace(x_lower_array[environment],x_upper_array[environment], n)
+        y_init_space = np.linspace(y_lower_array[environment],y_upper_array[environment], n) # y pos is -2 + this offset
+        yaw_init_space = np.linspace(yaw_lower_array[environment],yaw_upper_array[environment], n) 
+        left_door_init_space = np.linspace(left_door_lower_array[environment],left_door_upper_array[environment], n) #left door x is -1 + this offset
+        right_door_init_space = np.linspace(right_door_lower_array[environment],right_door_upper_array[environment], n) # right door x is 1 + this offset
         noise = 0.2
         
         X, Y, YAW, LEFT, RIGHT = np.meshgrid(x_init_space, y_init_space, yaw_init_space, left_door_init_space, right_door_init_space)
@@ -158,6 +165,7 @@ def parse_hydra_configs(cfg: DictConfig):
         RIGHT = RIGHT.flatten()
 
         number_of_samples = X.shape[0]
+        print("Number of samples: ", number_of_samples)
 
         assert number_of_samples<=cfg.num_envs, "Number of samples should be less than or equal to number of environments"
         x_start_state = np.zeros((1, cfg.num_envs))
@@ -187,6 +195,8 @@ def parse_hydra_configs(cfg: DictConfig):
                 obs = env._task.get_observations()["jackal_view"]["obs_buf"]
                 obs = obs.view(cfg.num_envs, -1)
                 # actions = torch.tensor(np.array([env.action_space.sample() for _ in range(env.num_envs)]), device=task.rl_device)
+                print(obs.shape)
+                print(obs)
                 actions = agent.get_action(obs)
                 # actions = actions.unsqueeze(0)
                 env._task.pre_physics_step(actions)
@@ -220,22 +230,27 @@ def parse_hydra_configs(cfg: DictConfig):
 
             generated_num_points = 0
             num_points = 100
-            test_num_points = 20
+            test_num_points = num_points
 
             while generated_num_points<num_points:
 
-                num_points_x = int(round(test_num_points ** (1/5)))
-                num_points_y = int(round(test_num_points ** (1/5)))
-                num_points_yaw = int(round(test_num_points ** (1/5)))
-                num_points_left_door = int(round(test_num_points ** (1/5)))
-                num_points_right_door = test_num_points // (num_points_x * num_points_y * num_points_yaw * num_points_left_door)
+                # Determine the number of points along each axis
+                n = round(test_num_points ** (1/5))
+                if n**5 > test_num_points:
+                    n = n-1
+
+                # num_points_x = int(round(test_num_points ** (1/5)))
+                # num_points_y = int(round(test_num_points ** (1/5)))
+                # num_points_yaw = int(round(test_num_points ** (1/5)))
+                # num_points_left_door = int(round(test_num_points ** (1/5)))
+                # num_points_right_door = test_num_points // (num_points_x * num_points_y * num_points_yaw * num_points_left_door)
 
                 # Create the assessment environment
-                x_init_space = np.linspace(x_lower_array[i],x_upper_array[i], num_points_x)
-                y_init_space = np.linspace(y_lower_array[i],y_upper_array[i], num_points_y) # y pos is -2 + this offset
-                yaw_init_space = np.linspace(yaw_lower_array[i],yaw_upper_array[i], num_points_yaw) 
-                left_door_init_space = np.linspace(left_door_lower_array[i],left_door_upper_array[i], num_points_left_door) #left door x is -1 + this offset
-                right_door_init_space = np.linspace(right_door_lower_array[i],right_door_upper_array[i], num_points_right_door) # right door x is 1 + this offset
+                x_init_space = np.linspace(x_lower_array[i],x_upper_array[i], n)
+                y_init_space = np.linspace(y_lower_array[i],y_upper_array[i], n) # y pos is -2 + this offset
+                yaw_init_space = np.linspace(yaw_lower_array[i],yaw_upper_array[i], n) 
+                left_door_init_space = np.linspace(left_door_lower_array[i],left_door_upper_array[i], n) #left door x is -1 + this offset
+                right_door_init_space = np.linspace(right_door_lower_array[i],right_door_upper_array[i], n) # right door x is 1 + this offset
 
                 if i>0:
                     # create a boolean mask to identify points that are outside the range of x and y

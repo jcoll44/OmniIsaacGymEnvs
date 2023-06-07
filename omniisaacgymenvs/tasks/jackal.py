@@ -93,6 +93,9 @@ class JackalTask(RLTask):
 
         self.render_image = self._task_cfg["env"]["renderImages"]
 
+        self.linear_velocity = self._task_cfg["env"]["linearVelocity"]
+        self.linear_velocity_turn = self._task_cfg["env"]["linearVelocityTurn"]
+        self.angular_velocity = self._task_cfg["env"]["angularVelocity"]
 
 
         RLTask.__init__(self, name, env)
@@ -268,14 +271,15 @@ class JackalTask(RLTask):
         body_velocities = torch.zeros((self._jackals.count, 2), dtype=torch.float32, device=self._device)
         # linear velocity
         # linear velocity
-        body_velocities[:,0] = torch.where(actions == 0 , 1.5, 0.0)
-        body_velocities[:,0] = torch.where(actions == 1, 0.80, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 2, 0.80, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 3 , -1.5, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 0 , self.linear_velocity, 0.0)
+        body_velocities[:,0] = torch.where(actions == 1, self.linear_velocity_turn, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 2, self.linear_velocity_turn, body_velocities[:,0])
+        body_velocities[:,0] = torch.where(actions == 3 , -self.linear_velocity, body_velocities[:,0])
         body_velocities[:,0] = torch.where(actions == 4 , 0.0, body_velocities[:,0])
         # angular velocity
-        body_velocities[:,1] = torch.where(actions == 1, 20.0, 0.0)
-        body_velocities[:,1] = torch.where(actions == 2, -20.0, body_velocities[:,1])
+        body_velocities[:,1] = torch.where(actions == 1, self.angular_velocity, 0.0)
+        body_velocities[:,1] = torch.where(actions == 2, -self.angular_velocity, body_velocities[:,1])
+
         # Save to an array to add noise
         # self._action_array[:,-1,0] = body_velocities[:,0]
         # self._action_array[:,-1,1] = body_velocities[:,1]
