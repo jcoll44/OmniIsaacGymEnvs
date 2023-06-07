@@ -19,6 +19,10 @@ env:
 
   renderImages: False
 
+  linearVelocity: 2.0
+  linearVelocityTurn: 0.5
+  angularVelocity: 60.0
+
 sim:
   dt: 0.01 # 1/100 s
   use_gpu_pipeline: ${eq:${...pipeline},"gpu"}
@@ -76,7 +80,7 @@ sim:
     sleep_threshold: 0.005
     stabilization_threshold: 0.001
     # per-body
-    density: 2000
+    density: 2500
     max_depenetration_velocity: 100.0
     # per-shape
     contact_offset: 0.02
