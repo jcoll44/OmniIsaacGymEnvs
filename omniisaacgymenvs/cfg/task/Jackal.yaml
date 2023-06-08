@@ -23,6 +23,16 @@ env:
   linearVelocityTurn: 0.5
   angularVelocity: 60.0
 
+  robotXLower: -0.375  #-1.5
+  robotXUpper: 0.375  #1.5
+  robotYLower: -0.1125  #-0.3
+  robotYUpper: 0.0125  #0.2
+  robotYawLower: 1.1780972451  #0.0
+  robotYawUpper: 1.96349540848 #3.14
+
+  doorLower: -0.075  #-0.3
+  doorUpper: 0.075  #0.3
+
 sim:
   dt: 0.01 # 1/100 s
   use_gpu_pipeline: ${eq:${...pipeline},"gpu"}

@@ -97,6 +97,16 @@ class JackalTask(RLTask):
         self.linear_velocity_turn = self._task_cfg["env"]["linearVelocityTurn"]
         self.angular_velocity = self._task_cfg["env"]["angularVelocity"]
 
+        # Randomisations
+        self.robot_x_lower = self._task_cfg["env"]["robotXLower"]
+        self.robot_x_upper = self._task_cfg["env"]["robotXUpper"]
+        self.robot_y_lower = self._task_cfg["env"]["robotYLower"]
+        self.robot_y_upper = self._task_cfg["env"]["robotYUpper"]
+        self.robot_yaw_lower = self._task_cfg["env"]["robotYawLower"]
+        self.robot_yaw_upper = self._task_cfg["env"]["robotYawUpper"]
+        self.door_lower = self._task_cfg["env"]["doorLower"]
+        self.door_upper = self._task_cfg["env"]["doorUpper"]
+
 
         RLTask.__init__(self, name, env)
 
@@ -281,20 +291,20 @@ class JackalTask(RLTask):
         body_velocities[:,1] = torch.where(actions == 2, -self.angular_velocity, body_velocities[:,1])
 
         # Save to an array to add noise
-        # self._action_array[:,-1,0] = body_velocities[:,0]
-        # self._action_array[:,-1,1] = body_velocities[:,1]
+        self._action_array[:,-1,0] = body_velocities[:,0]
+        self._action_array[:,-1,1] = body_velocities[:,1]
         velocity = torch.zeros((self._jackals.count, self._jackals.num_dof), dtype=torch.float32, device=self._device)
-        # velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
-        # velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
+        velocity[:,0],velocity[:,1] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
+        velocity[:,2],velocity[:,3] = self.wheel_velocities(self._action_array[:,0,0],self._action_array[:,0,1])
 
 
-        velocity[:,0],velocity[:,1] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1]) #used when not considering noise
-        velocity[:,2],velocity[:,3] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1])
+        # velocity[:,0],velocity[:,1] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1]) #used when not considering noise
+        # velocity[:,2],velocity[:,3] = self.wheel_velocities(body_velocities[:,0],body_velocities[:,1])
 
         indices = torch.arange(self._jackals.count, dtype=torch.int32, device=self._device)
         self._jackals.set_joint_velocity_targets(velocity, indices=indices)
 
-        # self._action_array[:,0:-1,:] = self._action_array[:,1:,:]
+        self._action_array[:,0:-1,:] = self._action_array[:,1:,:]
 
 
 
@@ -302,25 +312,25 @@ class JackalTask(RLTask):
         num_resets = len(env_ids)
 
         # rot = torch.zeros(num_resets, dtype=torch.float, device=self.device)
-        rand_floats = torch_rand_float(0.0, 3.14, (len(env_ids),1), device=self.device)
+        rand_floats = torch_rand_float(self.robot_yaw_lower, self.robot_yaw_upper, (len(env_ids),1), device=self.device)
         new_jackal_rot = quat_from_angle_axis(rand_floats[:,0], self.z_unit_tensor[env_ids])
 
         root_pos = self.initial_root_pos.clone()
-        root_pos[env_ids, 0] += torch_rand_float(-1.5, 1.5, (num_resets, 1), device=self._device).view(-1)
-        root_pos[env_ids, 1] += torch_rand_float(-0.3, 0.2, (num_resets, 1), device=self._device).view(-1)
+        root_pos[env_ids, 0] += torch_rand_float(self.robot_x_lower, self.robot_x_upper, (num_resets, 1), device=self._device).view(-1)
+        root_pos[env_ids, 1] += torch_rand_float(self.robot_y_lower, self.robot_y_upper, (num_resets, 1), device=self._device).view(-1)
         root_velocities = self.root_velocities.clone()
 
         self._jackals.set_velocities(root_velocities[env_ids], indices=env_ids)
         self._jackals.set_world_poses(root_pos[env_ids], new_jackal_rot, indices=env_ids)
 
         root_pos = self.initial_left_pos.clone()
-        root_pos[env_ids, 0] += torch_rand_float(-0.3,0.3, (num_resets, 1), device=self._device).view(-1)
+        root_pos[env_ids, 0] += torch_rand_float(self.door_lower,self.door_upper, (num_resets, 1), device=self._device).view(-1)
         # root_pos[env_ids, 2] += 0.01
 
         self._left_door.set_world_poses(root_pos[env_ids], self.initial_root_rot[env_ids].clone(), indices=env_ids)
 
         root_pos = self.initial_right_pos.clone()
-        root_pos[env_ids, 0] += torch_rand_float(-0.3,0.3, (num_resets, 1), device=self._device).view(-1)
+        root_pos[env_ids, 0] += torch_rand_float(self.door_lower,self.door_upper, (num_resets, 1), device=self._device).view(-1)
         # root_pos[env_ids, 2] += 0.01
 
         self._right_door.set_world_poses(root_pos[env_ids], self.initial_root_rot[env_ids].clone(), indices=env_ids)
