@@ -77,9 +77,11 @@ def parse_hydra_configs(cfg: DictConfig):
     print_dict(cfg_dict)
 
     headless = True
-    render = not headless
+    render = False
+    enable_viewport = "enable_cameras" in cfg.task.sim and cfg.task.sim.enable_cameras
 
-    env = VecEnvRLGames(headless=headless, sim_device=cfg.device_id)
+    env = VecEnvRLGames(headless=headless, sim_device=cfg.device_id, enable_livestream=cfg.enable_livestream, enable_viewport=enable_viewport)
+    # env = VecEnvRLGames(headless=headless, sim_device=cfg.device_id)
     task = initialize_task(cfg_dict, env)
     cfg.num_envs = cfg_dict["task"]["env"]["numEnvs"]
     # cfg.maxEpisodeLength = 500
@@ -108,7 +110,7 @@ def parse_hydra_configs(cfg: DictConfig):
     runner = Runner(RLGPUAlgoObserver())
     runner.load(rlg_config_dict)
     agent = runner.create_player()
-    agent.restore(cfg.checkpoint)
+    
     agent.has_batch_dimension = True
 
 
@@ -129,10 +131,17 @@ def parse_hydra_configs(cfg: DictConfig):
     '''
     First we need to collect a dataset to initialize the nonparametric model
     '''
-    for environment in range(1):
+    for environment in range(4):
         print("Environment: ", environment)
         # Create the assessment environment
-        num_points = 200
+        num_points = 2000
+
+        file_path = "runs/Jackal/nn/Jackal_"+str(environment+1)+".pth"
+        if cfg.checkpoint:
+            cfg.checkpoint = retrieve_checkpoint_path(file_path)
+            if cfg.checkpoint is None:
+                quit()
+        agent.restore(cfg.checkpoint)
 
 
         # Determine the number of points along each axis
@@ -168,53 +177,53 @@ def parse_hydra_configs(cfg: DictConfig):
         print("Number of samples: ", number_of_samples)
 
         assert number_of_samples<=cfg.num_envs, "Number of samples should be less than or equal to number of environments"
-        x_start_state = np.zeros((1, cfg.num_envs))
-        x_start_state[0, :number_of_samples] = X
-        y_start_state = np.zeros((1, cfg.num_envs))
-        y_start_state[0, :number_of_samples] = Y
-        yaw_start_state = np.zeros((1, cfg.num_envs))
-        yaw_start_state[0, :number_of_samples] = YAW
-        left_door_start_state = np.zeros((1, cfg.num_envs))
-        left_door_start_state[0, :number_of_samples] = LEFT
-        right_door_start_state = np.zeros((1, cfg.num_envs))
-        right_door_start_state[0, :number_of_samples] = RIGHT
+        x_start_state = np.zeros((cfg.num_envs))
+        x_start_state[:number_of_samples] = X
+        y_start_state = np.zeros((cfg.num_envs))
+        y_start_state[:number_of_samples] = Y
+        yaw_start_state = np.zeros((cfg.num_envs))
+        yaw_start_state[:number_of_samples] = YAW
+        left_door_start_state = np.zeros((cfg.num_envs))
+        left_door_start_state[:number_of_samples] = LEFT
+        right_door_start_state = np.zeros((cfg.num_envs))
+        right_door_start_state[:number_of_samples] = RIGHT
 
 
 
         success_rate = 1.0
-        noise = 0.0
-        while success_rate>0.75:
-            noise += 0.05
-            env._task.update_noise_value(noise)
+        noise = 0.2
+        # while success_rate>0.75:
+        # noise += 0.05
+        env._task.update_noise_value(noise)
 
-            # Dataset for nonoparametric model for measuring confidence using training environment without noise
-            experience = Experience(prior_alpha = 0.0, prior_beta=0.0, length_scale=0.7, num_env = number_of_samples, num_samples = number_of_samples)
+        # Dataset for nonoparametric model for measuring confidence using training environment without noise
+        experience = Experience(prior_alpha = 0.0, prior_beta=0.0, length_scale=0.7, num_env = number_of_samples, num_samples = number_of_samples)
 
-            env.sim_frame_count = 0
-            collected_samples = False
-            while env._simulation_app.is_running() and not collected_samples:
-                if env._world.is_playing():
-                    if env._world.current_time_step_index == 0:
-                        env._task.set_start_state(x_start_state, y_start_state, yaw_start_state, left_door_start_state, right_door_start_state)
-                        # for j in range(10):
-                        #     env._world.step(render=render)
-                    obs = env._task.get_observations()["jackal_view"]["obs_buf"]
-                    obs = obs.view(cfg.num_envs, -1)
-                    # actions = torch.tensor(np.array([env.action_space.sample() for _ in range(env.num_envs)]), device=task.rl_device)
-                    actions = agent.get_action(obs)
-                    # actions = actions.unsqueeze(0)
-                    env._task.pre_physics_step(actions)
+        env.sim_frame_count = 0
+        collected_samples = False
+        while env._simulation_app.is_running() and not collected_samples:
+            if env._world.is_playing():
+                if env.sim_frame_count == 0:
+                    print("Resetting the environment")
+                    env._task.set_start_state(x_start_state, y_start_state, yaw_start_state, left_door_start_state, right_door_start_state)
                     env._world.step(render=render)
-                    obs_buf, rew_buf, reset_buf, extras  = env._task.post_physics_step()
-                    # print(rew_buf)
-                    collected_samples = experience.add_step(obs.cpu().detach().numpy()[:number_of_samples,:],rew_buf.cpu().detach().numpy()[:number_of_samples],reset_buf.cpu().detach().numpy()[:number_of_samples])
-                    env.sim_frame_count += 1
-                else:
-                    env._world.step(render=render)
-            
-            success_rate = experience.get_success_rate()
-            print("Success rate: ", success_rate)
-            print("Noise: ", noise)
+                obs = env._task.get_observations()["jackal_view"]["obs_buf"]
+                obs = obs.view(cfg.num_envs, -1)
+                # actions = torch.tensor(np.array([env.action_space.sample() for _ in range(env.num_envs)]), device=task.rl_device)
+                actions = agent.get_action(obs)
+                # actions = actions.unsqueeze(0)
+                env._task.pre_physics_step(actions)
+                env._world.step(render=render)
+                obs_buf, rew_buf, reset_buf, extras  = env._task.post_physics_step()
+                # print(rew_buf)
+                collected_samples = experience.add_step(obs.cpu().detach().numpy()[:number_of_samples,:],rew_buf.cpu().detach().numpy()[:number_of_samples],reset_buf.cpu().detach().numpy()[:number_of_samples])
+                env.sim_frame_count += 1
+            else:
+                env._world.step(render=render)
+        
+        success_rate = experience.get_success_rate()
+        print("Success rate: ", success_rate)
+        print("Noise: ", noise)
 
         print("Number of Successful states",len(experience.successful_states))
         print("Number of failure states",len(experience.unsuccessful_states))
@@ -233,15 +242,17 @@ def parse_hydra_configs(cfg: DictConfig):
         right_door_lower_array = [-0.075, -0.15, -0.225, -0.3]
         right_door_upper_array = [0.075, 0.15, 0.225, 0.3]
 
+        success_states = []
+        success_prediction_array = []
 
         for i in range(4):
             print("Test" ,i)
 
             generated_num_points = 0
-            num_points = 200
+            num_points = 2000
             test_num_points = num_points
 
-            while generated_num_points<num_points:
+            while generated_num_points<number_of_samples:
 
                 # Determine the number of points along each axis
                 n = round(test_num_points ** (1/5))
@@ -294,7 +305,7 @@ def parse_hydra_configs(cfg: DictConfig):
 
                 test_num_points += 20
 
-        
+            print("Number of evaluations: ",generated_num_points)
             X = X.flatten()
             Y = Y.flatten()
             YAW = YAW.flatten()
@@ -302,17 +313,23 @@ def parse_hydra_configs(cfg: DictConfig):
             RIGHT = RIGHT.flatten()
 
             assert generated_num_points<=cfg.num_envs, "Number of samples should be less than or equal to number of environments"
-            x_start_state = np.zeros((1, cfg.num_envs))
-            x_start_state[0, :generated_num_points] = X
-            y_start_state = np.zeros((1, cfg.num_envs))
-            y_start_state[0, :generated_num_points] = Y
-            yaw_start_state = np.zeros((1, cfg.num_envs))
-            yaw_start_state[0, :generated_num_points] = YAW
-            left_door_start_state = np.zeros((1, cfg.num_envs))
-            left_door_start_state[0, :generated_num_points] = LEFT
-            right_door_start_state = np.zeros((1, cfg.num_envs))
-            right_door_start_state[0, :generated_num_points] = RIGHT
+            x_start_state = np.zeros((cfg.num_envs))
+            x_start_state[:generated_num_points] = X
+            y_start_state = np.zeros((cfg.num_envs))
+            y_start_state[:generated_num_points] = Y
+            yaw_start_state = np.zeros((cfg.num_envs))
+            yaw_start_state[:generated_num_points] = YAW
+            left_door_start_state = np.zeros((cfg.num_envs))
+            left_door_start_state[:generated_num_points] = LEFT
+            right_door_start_state = np.zeros((cfg.num_envs))
+            right_door_start_state[:generated_num_points] = RIGHT
 
+            # Add noise
+            x_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
+            y_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
+            yaw_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
+            left_door_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
+            right_door_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
             # environmnents = np.vstack((X,Y,YAW,LEFT,RIGHT)).T
             # print(environmnents.shape)
             # print(environmnents)
@@ -324,16 +341,22 @@ def parse_hydra_configs(cfg: DictConfig):
                 state = np.array([X[j], Y[j]-2.0, YAW[j], LEFT[j]-1.0, RIGHT[j]+1.0])
                 Prediction[j], sigma, alpha, beta = experience.get_state_value(state)
             print("Completed Prediction")
+
+            # Dataset for nonoparametric model for measuring confidence using training environment without noise
+            experience2 = Experience(prior_alpha = 0.0, prior_beta=0.0, length_scale=0.7, num_env = generated_num_points, num_samples = generated_num_points)
         
             successful_states = np.zeros_like(X)
             env._task.update_noise_value(noise)
             env.sim_frame_count=0
             obs = env._world.reset(soft=True)
-            while env._simulation_app.is_running() and env.sim_frame_count<500:
+            collected_samples = False
+            env.sim_frame_count = 0
+            while env._simulation_app.is_running() and not collected_samples:
                 if env._world.is_playing():
-                    if env._world.current_time_step_index == 0:
+                    if env.sim_frame_count == 0:
+                        print("Resetting the environment")
                         env._task.set_start_state(x_start_state, y_start_state, yaw_start_state, left_door_start_state, right_door_start_state)
-
+                        env._world.step(render=render)
                     obs = env._task.get_observations()["jackal_view"]["obs_buf"]
                     obs = obs.view(cfg.num_envs, -1)
                     # actions = torch.tensor(np.array([env.action_space.sample() for _ in range(env.num_envs)]), device=task.rl_device)
@@ -343,31 +366,54 @@ def parse_hydra_configs(cfg: DictConfig):
                     env._world.step(render=render)
                     obs_buf, rew_buf, reset_buf, extras  = env._task.post_physics_step()
                     env.sim_frame_count += 1
+                    collected_samples = experience2.add_step(obs.cpu().detach().numpy()[:generated_num_points,:],rew_buf.cpu().detach().numpy()[:generated_num_points],reset_buf.cpu().detach().numpy()[:generated_num_points])
 
-                    successful_states += np.where(rew_buf.cpu().detach().numpy()[:generated_num_points] == 100, 1, 0)
+                    # successful_states += np.where(rew_buf.cpu().detach().numpy()[:generated_num_points] == 100, 1, 0)
+                    env.sim_frame_count += 1
                 else:
                     env._world.step(render=render)
                 
-            successful_states = np.where(successful_states > 0, 1, 0)
-            print("Actual Success Rate: ",np.sum(successful_states)/generated_num_points)
+            # successful_states = np.where(successful_states > 0, 1, 0)
+            success_rate = experience2.get_success_rate()
+            print("Actual Success Rate: ",success_rate)
             success_prediction = np.where(Prediction > 0.5, 1, 0)
-            print("Prdicted Success Rate: ",np.sum(success_prediction)/generated_num_points)
+            print("Predicted Success Rate: ",np.sum(success_prediction)/generated_num_points)
+            success_states.append(success_rate)
+            success_prediction_array.append(np.sum(success_prediction)/generated_num_points)
 
 
+        x = np.array(['0', '1', '2', '3'])
+        y = np.array([success_states[0], success_states[1], success_states[2], success_states[3]])
+        y2 = np.array([success_prediction_array[0], success_prediction_array[1], success_prediction_array[2], success_prediction_array[3]])
 
-    x = np.array(['A', 'B', 'C', 'D'])
-    y = np.array([10, 15, 7, 12])
+        success_data_location = "success_data_"+str(environment)+".npy"
+        predicition_data_location = "prediction_data_"+str(environment)+".npy"
+        np.save(success_data_location, y)
+        np.save(predicition_data_location, y2)
 
-    fig, ax = plt.subplots()
-    ax.bar(x, y)
+        fig, ax = plt.subplots()
+        ax.bar(x, y)
 
-    ax.set_xlabel('Categories')
-    ax.set_ylabel('Values')
-    ax.set_title('Bar Plot')
+        ax.set_xlabel('Distribution')
+        ax.set_ylabel('Success Rate')
+        ax.set_title('Success Rate Trained on Distribtion '+str(environment))
+        ax.set_ylim(0, 1)  # Set y-axis limits to 0 and 1
 
-    plt.show()
-    plt.savefig('bar_plot.png')
+        plt.show()
+        plot_name = "success_rate_"+str(environment)+".png"
+        plt.savefig(plot_name)
 
+        fig, ax = plt.subplots()
+        ax.bar(x, y2)
+
+        ax.set_xlabel('Distribution')
+        ax.set_ylabel('Success Rate')
+        ax.set_title('Predicted Success Trained on Distribtion '+str(environment))
+        ax.set_ylim(0, 1)  # Set y-axis limits to 0 and 1
+
+        plt.show()
+        plot_name = "prediction_"+str(environment)+".png"
+        plt.savefig(plot_name)
 
 
     env._simulation_app.close()

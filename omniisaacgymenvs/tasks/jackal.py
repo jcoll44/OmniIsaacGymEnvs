@@ -140,7 +140,7 @@ class JackalTask(RLTask):
         scene.add(self._walls)
         scene.add(self._left_door)
         scene.add(self._right_door)
-        scene.add_ground_plane(size=200.0, color=torch.tensor([0.01,0.01,0.01]))
+        scene.add_ground_plane(size=20000.0, color=torch.tensor([0.01,0.01,0.01]))
 
         self.root_pos, self.root_rot = self._jackals.get_world_poses(clone=False)
         # self.dof_pos = self._jackals.get_joint_positions(clone=False)
@@ -421,17 +421,16 @@ class JackalTask(RLTask):
         jackal_yaw = torch.tensor(jackal_yaw, dtype=torch.float, device=self.device)
         left_door = torch.tensor(left_door, dtype=torch.float, device=self.device)
         right_door = torch.tensor(right_door, dtype=torch.float, device=self.device)
-        print(jackal_yaw.shape)
         env_ids = [i for i in range(jackal_yaw.shape[0])]
-        new_jackal_rot = quat_from_angle_axis(jackal_yaw, self.z_unit_tensor[env_ids])
+        new_jackal_rot = quat_from_angle_axis(jackal_yaw, self.z_unit_tensor)
 
         root_pos = self.initial_root_pos.clone()
         root_pos[:, 0] += jackal_x
         root_pos[:, 1] += jackal_y
         root_velocities = self.root_velocities.clone()
 
-        self._jackals.set_velocities(root_velocities[:], indices=env_ids)
-        self._jackals.set_world_poses(root_pos[:], new_jackal_rot, indices=env_ids)
+        self._jackals.set_velocities(root_velocities[:])
+        self._jackals.set_world_poses(root_pos[:], new_jackal_rot[:])
 
         root_pos = self.initial_left_pos.clone()
         root_pos[:, 0] += left_door
