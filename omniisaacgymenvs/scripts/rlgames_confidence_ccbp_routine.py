@@ -77,7 +77,7 @@ def parse_hydra_configs(cfg: DictConfig):
     print_dict(cfg_dict)
 
     headless = True
-    render = False
+    render = True
     enable_viewport = "enable_cameras" in cfg.task.sim and cfg.task.sim.enable_cameras
 
     env = VecEnvRLGames(headless=headless, sim_device=cfg.device_id, enable_livestream=cfg.enable_livestream, enable_viewport=enable_viewport)
@@ -110,7 +110,7 @@ def parse_hydra_configs(cfg: DictConfig):
     runner = Runner(RLGPUAlgoObserver())
     runner.load(rlg_config_dict)
     agent = runner.create_player()
-    
+    agent.restore(cfg.checkpoint)
     agent.has_batch_dimension = True
 
 
@@ -134,14 +134,14 @@ def parse_hydra_configs(cfg: DictConfig):
     for environment in range(4):
         print("Environment: ", environment)
         # Create the assessment environment
-        num_points = 2000
+        num_points = 1000
 
-        file_path = "runs/Jackal/nn/Jackal_"+str(environment+1)+".pth"
-        if cfg.checkpoint:
-            cfg.checkpoint = retrieve_checkpoint_path(file_path)
-            if cfg.checkpoint is None:
-                quit()
-        agent.restore(cfg.checkpoint)
+        # file_path = "runs/Jackal/nn/Jackal_"+str(environment+1)+".pth"
+        # if cfg.checkpoint:
+        #     cfg.checkpoint = retrieve_checkpoint_path(file_path)
+        #     if cfg.checkpoint is None:
+        #         quit()
+        # 
 
 
         # Determine the number of points along each axis
@@ -191,7 +191,7 @@ def parse_hydra_configs(cfg: DictConfig):
 
 
         success_rate = 1.0
-        noise = 0.2
+        noise = 0.0
         # while success_rate>0.75:
         # noise += 0.05
         env._task.update_noise_value(noise)
@@ -249,7 +249,7 @@ def parse_hydra_configs(cfg: DictConfig):
             print("Test" ,i)
 
             generated_num_points = 0
-            num_points = 2000
+            num_points = 300
             test_num_points = num_points
 
             while generated_num_points<number_of_samples:
@@ -325,11 +325,11 @@ def parse_hydra_configs(cfg: DictConfig):
             right_door_start_state[:generated_num_points] = RIGHT
 
             # Add noise
-            x_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
-            y_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
-            yaw_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
-            left_door_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
-            right_door_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
+            # x_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
+            # y_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
+            # yaw_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
+            # left_door_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
+            # right_door_start_state[:generated_num_points] += np.random.normal(0, 0.5, size=(generated_num_points))
             # environmnents = np.vstack((X,Y,YAW,LEFT,RIGHT)).T
             # print(environmnents.shape)
             # print(environmnents)
@@ -408,7 +408,7 @@ def parse_hydra_configs(cfg: DictConfig):
 
         ax.set_xlabel('Distribution')
         ax.set_ylabel('Success Rate')
-        ax.set_title('Predicted Success Trained on Distribtion '+str(environment))
+        ax.set_title('Predicted Success Trained on Data Collect from Distribtion '+str(environment))
         ax.set_ylim(0, 1)  # Set y-axis limits to 0 and 1
 
         plt.show()
