@@ -70,3 +70,12 @@ class Experience(object):
 
     def get_success_rate(self):
         return len(self.successful_states)/self.num_env
+
+    
+    def save(self, file_name):
+        data= {
+            'successful_trajectories': self.successful_states,
+            'unsuccessful_trajectories': self.unsuccessful_states
+        }
+        with open(file_name, 'wb') as f:
+            pickle.dump(data, f)

@@ -13,7 +13,7 @@ from omniisaacgymenvs.utils.experience import Experience
 
 import hydra
 from omegaconf import DictConfig
-
+import pickle
 import datetime
 import os
 import torch
@@ -77,7 +77,7 @@ def parse_hydra_configs(cfg: DictConfig):
     print_dict(cfg_dict)
 
     headless = True
-    render = True
+    render = False
     enable_viewport = "enable_cameras" in cfg.task.sim and cfg.task.sim.enable_cameras
 
     env = VecEnvRLGames(headless=headless, sim_device=cfg.device_id, enable_livestream=cfg.enable_livestream, enable_viewport=enable_viewport)
@@ -117,24 +117,33 @@ def parse_hydra_configs(cfg: DictConfig):
     '''
     Loop through the test environments collecting the successes and failures
     '''
-    x_lower_array = [-0.375, -0.75, -1.125, -1.5]
-    x_upper_array = [0.375, 0.75, 1.125, 1.5]
-    y_lower_array = [-0.1125, -0.175, -0.2375, -0.3]
-    y_upper_array = [0.0125, 0.075, 0.1375, 0.2]
-    yaw_lower_array = [1.1780972451, 0.78539816341, 0.39269908172, 0.0]
-    yaw_upper_array = [1.96349540848, 2.35619449017, 2.74889357186, 3.14]
-    left_door_lower_array = [-0.075, -0.15, -0.225, -0.3]
-    left_door_upper_array = [0.075, 0.15, 0.225, 0.3]
-    right_door_lower_array = [-0.075, -0.15, -0.225, -0.3]
-    right_door_upper_array = [0.075, 0.15, 0.225, 0.3]
-
+    # x_lower_array = [-0.375, -0.75, -1.125, -1.5]
+    # x_upper_array = [0.375, 0.75, 1.125, 1.5]
+    # y_lower_array = [-0.1125, -0.175, -0.2375, -0.3]
+    # y_upper_array = [0.0125, 0.075, 0.1375, 0.2]
+    # yaw_lower_array = [1.1780972451, 0.78539816341, 0.39269908172, 0.0]
+    # yaw_upper_array = [1.96349540848, 2.35619449017, 2.74889357186, 3.14]
+    # left_door_lower_array = [-0.075, -0.15, -0.225, -0.3]
+    # left_door_upper_array = [0.075, 0.15, 0.225, 0.3]
+    # right_door_lower_array = [-0.075, -0.15, -0.225, -0.3]
+    # right_door_upper_array = [0.075, 0.15, 0.225, 0.3]
+    x_lower_array = [-0.75, -1.5]
+    x_upper_array = [0.75, 1.5]
+    y_lower_array = [-0.175, -0.3]
+    y_upper_array = [0.075, 0.2]
+    yaw_lower_array = [0.78539816341, 0.0]
+    yaw_upper_array = [2.35619449017, 3.14]
+    left_door_lower_array = [-0.15, -0.3]
+    left_door_upper_array = [ 0.15, 0.3]
+    right_door_lower_array = [-0.15, -0.3]
+    right_door_upper_array = [0.15, 0.3]
     '''
     First we need to collect a dataset to initialize the nonparametric model
     '''
-    for environment in range(4):
+    for environment in range(2):
         print("Environment: ", environment)
         # Create the assessment environment
-        num_points = 1000
+        num_points = 2000
 
         # file_path = "runs/Jackal/nn/Jackal_"+str(environment+1)+".pth"
         # if cfg.checkpoint:
@@ -197,7 +206,7 @@ def parse_hydra_configs(cfg: DictConfig):
         env._task.update_noise_value(noise)
 
         # Dataset for nonoparametric model for measuring confidence using training environment without noise
-        experience = Experience(prior_alpha = 0.0, prior_beta=0.0, length_scale=0.7, num_env = number_of_samples, num_samples = number_of_samples)
+        experience = Experience(prior_alpha = 0.0, prior_beta=0.0, length_scale=1.2, num_env = number_of_samples, num_samples = number_of_samples)
 
         env.sim_frame_count = 0
         collected_samples = False
@@ -231,25 +240,35 @@ def parse_hydra_configs(cfg: DictConfig):
         '''
         Loop through the test environments collecting the successes and failures
         '''
-        x_lower_array = [-0.375, -0.75, -1.125, -1.5]
-        x_upper_array = [0.375, 0.75, 1.125, 1.5]
-        y_lower_array = [-0.1125, -0.175, -0.2375, -0.3]
-        y_upper_array = [0.0125, 0.075, 0.1375, 0.2]
-        yaw_lower_array = [1.1780972451, 0.78539816341, 0.39269908172, 0.0]
-        yaw_upper_array = [1.96349540848, 2.35619449017, 2.74889357186, 3.14]
-        left_door_lower_array = [-0.075, -0.15, -0.225, -0.3]
-        left_door_upper_array = [0.075, 0.15, 0.225, 0.3]
-        right_door_lower_array = [-0.075, -0.15, -0.225, -0.3]
-        right_door_upper_array = [0.075, 0.15, 0.225, 0.3]
+        # x_lower_array = [-0.375, -0.75, -1.125, -1.5]
+        # x_upper_array = [0.375, 0.75, 1.125, 1.5]
+        # y_lower_array = [-0.1125, -0.175, -0.2375, -0.3]
+        # y_upper_array = [0.0125, 0.075, 0.1375, 0.2]
+        # yaw_lower_array = [1.1780972451, 0.78539816341, 0.39269908172, 0.0]
+        # yaw_upper_array = [1.96349540848, 2.35619449017, 2.74889357186, 3.14]
+        # left_door_lower_array = [-0.075, -0.15, -0.225, -0.3]
+        # left_door_upper_array = [0.075, 0.15, 0.225, 0.3]
+        # right_door_lower_array = [-0.075, -0.15, -0.225, -0.3]
+        # right_door_upper_array = [0.075, 0.15, 0.225, 0.3]
+        x_lower_array = [-0.75,-1.5]
+        x_upper_array = [0.75,1.5]
+        y_lower_array = [-0.175,-0.3]
+        y_upper_array = [0.075,0.2]
+        yaw_lower_array = [0.78539816341,0.0]
+        yaw_upper_array = [2.35619449017,3.14]
+        left_door_lower_array = [-0.15,-0.3]
+        left_door_upper_array = [0.15,0.3]
+        right_door_lower_array = [-0.15,-0.3]
+        right_door_upper_array = [0.15,0.3]
 
         success_states = []
         success_prediction_array = []
 
-        for i in range(4):
+        for i in range(2):
             print("Test" ,i)
 
             generated_num_points = 0
-            num_points = 300
+            # num_points = num_points
             test_num_points = num_points
 
             while generated_num_points<number_of_samples:
@@ -311,6 +330,14 @@ def parse_hydra_configs(cfg: DictConfig):
             YAW = YAW.flatten()
             LEFT = LEFT.flatten()
             RIGHT = RIGHT.flatten()
+
+            # Assessable datapoints
+            stacked = np.vstack((X,Y,YAW,LEFT,RIGHT)).T
+            print("Stacked shape: ",stacked.shape)
+            with open("data/assessable_datapoints_"+str(i)+".pkl", 'wb') as f:
+                pickle.dump(stacked, f)
+
+
 
             assert generated_num_points<=cfg.num_envs, "Number of samples should be less than or equal to number of environments"
             x_start_state = np.zeros((cfg.num_envs))
@@ -382,9 +409,9 @@ def parse_hydra_configs(cfg: DictConfig):
             success_prediction_array.append(np.sum(success_prediction)/generated_num_points)
 
 
-        x = np.array(['0', '1', '2', '3'])
-        y = np.array([success_states[0], success_states[1], success_states[2], success_states[3]])
-        y2 = np.array([success_prediction_array[0], success_prediction_array[1], success_prediction_array[2], success_prediction_array[3]])
+        x = np.array(['0', '1'])
+        y = np.array([success_states[0], success_states[1]])
+        y2 = np.array([success_prediction_array[0], success_prediction_array[1]])
 
         success_data_location = "success_data_"+str(environment)+".npy"
         predicition_data_location = "prediction_data_"+str(environment)+".npy"
@@ -415,6 +442,13 @@ def parse_hydra_configs(cfg: DictConfig):
         plot_name = "prediction_"+str(environment)+".png"
         plt.savefig(plot_name)
 
+    # Training data
+    
+    experience.save("data/training_distribution_"+str(number_of_samples)+".pkl")
+
+
+
+    
 
     env._simulation_app.close()
 
