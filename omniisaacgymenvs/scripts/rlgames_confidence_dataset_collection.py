@@ -26,7 +26,7 @@ from rl_games.common import env_configurations, vecenv
 from rl_games.torch_runner import Runner
 
 """
-PYTHON_PATH scripts/rlgames_confidence_ccbp_routine.py task=Jackal headless=True num_envs=30 test=True checkpoint=runs/Jackal/nn/Jackal.pth enable_livestream=True  
+/isaac-sim scripts/python.sh rlgames_confidence_dataset_collection.py task=Jackal headless=True test=True checkpoint=runs/Jackal/nn/Jackal.pth enable_livestream=False
 """
 
 # Current training range parameters:
