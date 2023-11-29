@@ -21,20 +21,35 @@ class Experience(object):
             self.episode_list.append([])
 
     def add_step(self, obs, reward, reset):
-        for index in range(self.num_env):
-            self.episode_list[index].append(obs[index,:])
-            if reward[index] > 0 and reset[index] == 1:
+        if self.num_env <= 1:
+            self.episode_list.append(obs)
+            if reward > 0 and reset == 1:
                 if self.num_reset_envs<self.desired_samples:
                     self.num_reset_envs +=1 
-                    self.successful_states.append(self.episode_list[index])
-                    self.episode_list[index] = []
+                    self.successful_states.append(self.episode_list)
+                    self.episode_list = []
 
 
-            elif reset[index] == 1:
+            elif reset == 1:
                 if self.num_reset_envs < self.desired_samples:
                     self.num_reset_envs+=1
-                    self.unsuccessful_states.append(self.episode_list[index])
-                    self.episode_list[index] = []
+                    self.unsuccessful_states.append(self.episode_list)
+                    self.episode_list = []
+        else:
+            for index in range(self.num_env):
+                self.episode_list[index].append(obs[index,:])
+                if reward[index] > 0 and reset[index] == 1:
+                    if self.num_reset_envs<self.desired_samples:
+                        self.num_reset_envs +=1 
+                        self.successful_states.append(self.episode_list[index])
+                        self.episode_list[index] = []
+
+
+                elif reset[index] == 1:
+                    if self.num_reset_envs < self.desired_samples:
+                        self.num_reset_envs+=1
+                        self.unsuccessful_states.append(self.episode_list[index])
+                        self.episode_list[index] = []
 
         if self.num_reset_envs == self.desired_samples:
             return True
@@ -69,7 +84,7 @@ class Experience(object):
         return value, sigma, alpha, beta
 
     def get_success_rate(self):
-        return len(self.successful_states)/self.num_env
+        return len(self.successful_states)/self.desired_samples
 
     
     def save(self, file_name):

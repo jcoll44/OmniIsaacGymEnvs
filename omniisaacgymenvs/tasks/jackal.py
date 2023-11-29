@@ -304,7 +304,7 @@ class JackalTask(RLTask):
         indices = torch.arange(self._jackals.count, dtype=torch.int32, device=self._device)
         self._jackals.set_joint_velocity_targets(velocity, indices=indices)
 
-        self._action_array[:,0:-1,:] = self._action_array[:,1:,:]
+        self._action_array[:,0:-1,:] = self._action_array[:,1:,:].clone()
 
 
 

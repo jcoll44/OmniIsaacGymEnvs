@@ -25,6 +25,8 @@ from matplotlib.ticker import LinearLocator
 from rl_games.common import env_configurations, vecenv
 from rl_games.torch_runner import Runner
 
+import cv2 as cv2
+
 """
 /isaac-sim scripts/python.sh rlgames_confidence_dataset_collection.py task=Jackal headless=True test=True checkpoint=runs/Jackal/nn/Jackal.pth enable_livestream=False
 """
@@ -69,6 +71,48 @@ from rl_games.torch_runner import Runner
 # Right door x -> (-0.3, 0.3) or (0.7, 1.3) because of an offset
 # Noise level -> 0.2
 
+def save_video(video, filepath):
+    """
+    saves a sequence of images as a mpeg video
+    """
+    # check there is a folder location and if not make it
+    isExist = os.path.exists(filepath)
+    if not isExist:
+
+    # Create a new directory because it does not exist
+        os.makedirs(filepath)
+    filename = "vid.mp4"
+    # Define the codec and create VideoWriter object
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(filepath+filename, fourcc, 40.0, (700, 700))
+
+    print("Saving video")
+    for frame in video:
+        frame = np.moveaxis(frame, 0, -1)
+        frame = frame.astype(np.uint8)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        out.write(frame)
+
+    print("Video saved")
+
+    out.release()
+
+def save_first_frame(image, filepath):
+    isExist = os.path.exists(filepath)
+    if not isExist:
+    # Create a new directory because it does not exist
+        os.makedirs(filepath)
+
+    image = image.cpu().detach().numpy()[0,:,:,:]
+    image = np.moveaxis(image, 0, -1)
+    # image = np.moveaxis(image, 0, 1)
+    # image = image * 255
+    image = image.astype(np.uint8)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    filename = "first_frame.png"
+    # im = Image.fromarray(image)
+    # im.save(filepath+filename)
+    cv2.imwrite(filepath+filename, image)
 
 @hydra.main(config_name="config", config_path="../cfg")
 def parse_hydra_configs(cfg: DictConfig):
@@ -77,7 +121,7 @@ def parse_hydra_configs(cfg: DictConfig):
     print_dict(cfg_dict)
 
     headless = True
-    render = False
+    render = True
     enable_viewport = "enable_cameras" in cfg.task.sim and cfg.task.sim.enable_cameras
 
     env = VecEnvRLGames(headless=headless, sim_device=cfg.device_id, enable_livestream=cfg.enable_livestream, enable_viewport=enable_viewport)
@@ -185,22 +229,22 @@ def parse_hydra_configs(cfg: DictConfig):
         number_of_samples = X.shape[0]
         print("Number of samples: ", number_of_samples)
 
-        assert number_of_samples<=cfg.num_envs, "Number of samples should be less than or equal to number of environments"
-        x_start_state = np.zeros((cfg.num_envs))
-        x_start_state[:number_of_samples] = X
-        y_start_state = np.zeros((cfg.num_envs))
-        y_start_state[:number_of_samples] = Y
-        yaw_start_state = np.zeros((cfg.num_envs))
-        yaw_start_state[:number_of_samples] = YAW
-        left_door_start_state = np.zeros((cfg.num_envs))
-        left_door_start_state[:number_of_samples] = LEFT
-        right_door_start_state = np.zeros((cfg.num_envs))
-        right_door_start_state[:number_of_samples] = RIGHT
+        # assert number_of_samples<=cfg.num_envs, "Number of samples should be less than or equal to number of environments"
+        # x_start_state = np.zeros((number_of_samples))
+        # x_start_state[:number_of_samples] = X
+        # y_start_state = np.zeros((number_of_samples))
+        # y_start_state[:number_of_samples] = Y
+        # yaw_start_state = np.zeros((number_of_samples))
+        # yaw_start_state[:number_of_samples] = YAW
+        # left_door_start_state = np.zeros((number_of_samples))
+        # left_door_start_state[:number_of_samples] = LEFT
+        # right_door_start_state = np.zeros((number_of_samples))
+        # right_door_start_state[:number_of_samples] = RIGHT
 
 
 
         success_rate = 1.0
-        noise = 0.38
+        noise = 0.2
         # while success_rate>0.75:
         # noise += 0.05
         env._task.update_noise_value(noise)
@@ -213,34 +257,83 @@ def parse_hydra_configs(cfg: DictConfig):
         # env._task.update_noise_value(noise)
 
         # Dataset for nonoparametric model for measuring confidence using training environment without noise
-        experience = Experience(prior_alpha = 0.0, prior_beta=0.0, length_scale=1.2, num_env = number_of_samples, num_samples = number_of_samples)
-
-        while env._simulation_app.is_running() and not collected_samples:
-            if env._world.is_playing():
-                if env.sim_frame_count == 0:
-                    print("Resetting the environment")
-                    env._task.set_start_state(x_start_state, y_start_state, yaw_start_state, left_door_start_state, right_door_start_state)
+        experience = Experience(prior_alpha = 0.0, prior_beta=0.0, length_scale=1.2, num_env = cfg.num_envs, num_samples = number_of_samples)
+        env._world.step(render=render)
+        env._world.step(render=render)
+        env._world.step(render=render)
+        # while env._simulation_app.is_running() and not collected_samples:
+        #     if env._world.is_playing():
+        #         if env.sim_frame_count == 0:
+        #             print("Resetting the environment")
+        #             env._task.set_start_state(x_start_state, y_start_state, yaw_start_state, left_door_start_state, right_door_start_state)
+        #             env._world.step(render=render)
+        #         obs = env._task.get_observations()["jackal_view"]["obs_buf"]
+        #         obs = obs.view(cfg.num_envs, -1)
+        #         # actions = torch.tensor(np.array([env.action_space.sample() for _ in range(env.num_envs)]), device=task.rl_device)
+        #         actions = agent.get_action(obs)
+        #         # actions = actions.unsqueeze(0)
+        #         env._task.pre_physics_step(actions)
+        #         env._world.step(render=render)
+        #         obs_buf, rew_buf, reset_buf, extras  = env._task.post_physics_step()
+        #         # print(rew_buf)
+        #         collected_samples = experience.add_step(obs.cpu().detach().numpy()[:number_of_samples,:],rew_buf.cpu().detach().numpy()[:number_of_samples],reset_buf.cpu().detach().numpy()[:number_of_samples])
+        #         video.append(image.cpu().detach().numpy()[0,:,:,:])
+        #         if reset_buf.cpu().detach().numpy()[0] == 1:
+        #             save_video(video, "recordings/"+str(i)+"/")
+        #             video = []   
+        #             env.sim_frame_count += 0        
+        #         env.sim_frame_count += 1
+        #     else:
+        #         env._world.step(render=render)
+        for i in range(X.shape[0]):
+            env.sim_frame_count=0
+            print(i)
+            # 
+            video = []
+            while env._simulation_app.is_running():
+                if env._world.is_playing():
+                    if env.sim_frame_count == 0:
+                        # obs = env._world.reset(soft=True)
+                        env._task.set_start_state(np.expand_dims(X[i],0), np.expand_dims(Y[i],0), np.expand_dims(YAW[i],0), np.expand_dims(LEFT[i],0), np.expand_dims(RIGHT[i],0))
+                        for j in range(10):
+                            env._world.step(render=render)
+                    obs = env._task.get_observations()["jackal_view"]["obs_buf"]
+                    obs = obs.view(cfg.num_envs, -1)
+                    # actions = torch.tensor(np.array([env.action_space.sample() for _ in range(env.num_envs)]), device=task.rl_device)
+                    actions = agent.get_action(obs)
+                    # actions = actions.unsqueeze(0)
+                    env._task.pre_physics_step(actions)
                     env._world.step(render=render)
-                obs = env._task.get_observations()["jackal_view"]["obs_buf"]
-                obs = obs.view(cfg.num_envs, -1)
-                # actions = torch.tensor(np.array([env.action_space.sample() for _ in range(env.num_envs)]), device=task.rl_device)
-                actions = agent.get_action(obs)
-                # actions = actions.unsqueeze(0)
-                env._task.pre_physics_step(actions)
-                env._world.step(render=render)
-                obs_buf, rew_buf, reset_buf, extras  = env._task.post_physics_step()
-                # print(rew_buf)
-                collected_samples = experience.add_step(obs.cpu().detach().numpy()[:number_of_samples,:],rew_buf.cpu().detach().numpy()[:number_of_samples],reset_buf.cpu().detach().numpy()[:number_of_samples])
-                env.sim_frame_count += 1
-            else:
-                env._world.step(render=render)
-    
+                    obs_buf, rew_buf, reset_buf, extras  = env._task.post_physics_step()
+                    collected_samples = experience.add_step(obs.cpu().detach().numpy(),rew_buf.cpu().detach().numpy(),reset_buf.cpu().detach().numpy())
+                    image = env._task.get_image()
+                    video.append(image.cpu().detach().numpy()[0,:,:,:])
+                    if reset_buf.cpu().detach().numpy()[0] == 1:
+                        save_video(video, "data/training_"+str(environment)+"/"+str(i)+"/")
+                        break
+                    if env.sim_frame_count==0:
+                        save_first_frame(image, "data/training_"+str(environment)+"/"+str(i)+"/")
+                    env.sim_frame_count += 1
+                else:
+                    env._world.step(render=render)  
+
         success_rate = experience.get_success_rate()
         print("Success rate: ", success_rate)
 
 
         print("Number of Successful states",len(experience.successful_states))
         print("Number of failure states",len(experience.unsuccessful_states))
+
+
+        # Save Training datapoints
+        stacked = np.vstack((X,Y,YAW,LEFT,RIGHT)).T
+        print("Stacked shape: ",stacked.shape)
+        with open("data/training_"+str(environment)+"/datapoints.pkl", 'wb') as f:
+            pickle.dump(stacked, f)  
+
+        experience.save("data/training_"+str(environment)+"/experience.pkl")
+
+
 
     #     '''
     #     Loop through the test environments collecting the successes and failures
