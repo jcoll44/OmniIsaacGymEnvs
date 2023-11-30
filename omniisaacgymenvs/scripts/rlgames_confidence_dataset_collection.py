@@ -27,10 +27,6 @@ from rl_games.torch_runner import Runner
 
 import cv2 as cv2
 
-"""
-/isaac-sim scripts/python.sh rlgames_confidence_dataset_collection.py task=Jackal headless=True test=True checkpoint=runs/Jackal/nn/Jackal.pth enable_livestream=False
-"""
-
 # Current training range parameters:
 # Jackal x -> (-1.5, 1.5)
 # Jackal y -> (-0.3, 0.2) or (-2.3, -1.8) because of an offset
@@ -187,6 +183,8 @@ def parse_hydra_configs(cfg: DictConfig):
     for environment in range(2):
         print("Environment: ", environment)
         # Create the assessment environment
+
+        # desired number of points
         num_points = 2000
 
         # file_path = "runs/Jackal/nn/Jackal_"+str(environment+1)+".pth"
@@ -197,13 +195,12 @@ def parse_hydra_configs(cfg: DictConfig):
         # 
 
 
-        # Determine the number of points along each axis
+        # Determine the number of points along each axis - first method
         n = round(num_points ** (1/5))
         if n**5 > num_points:
             n = n-1
 
-
-        # Determine the number of sample points along each axis
+        # Determine the number of sample points along each axis - second method
         # num_points_x = int(round(num_points ** (1/5)))
         # num_points_y = int(round(num_points ** (1/5)))
         # num_points_yaw = int(round(num_points ** (1/5)))
@@ -216,7 +213,7 @@ def parse_hydra_configs(cfg: DictConfig):
         yaw_init_space = np.linspace(yaw_lower_array[environment],yaw_upper_array[environment], n) 
         left_door_init_space = np.linspace(left_door_lower_array[environment],left_door_upper_array[environment], n) #left door x is -1 + this offset
         right_door_init_space = np.linspace(right_door_lower_array[environment],right_door_upper_array[environment], n) # right door x is 1 + this offset
-        
+                
         
         X, Y, YAW, LEFT, RIGHT = np.meshgrid(x_init_space, y_init_space, yaw_init_space, left_door_init_space, right_door_init_space)
 
@@ -226,6 +223,20 @@ def parse_hydra_configs(cfg: DictConfig):
         LEFT = LEFT.flatten()
         RIGHT = RIGHT.flatten()
 
+        #add a small amount of gaussian noise to the points
+        X += np.random.normal(0, 0.05, size=(X.shape[0]))
+        Y += np.random.normal(0, 0.05, size=(Y.shape[0]))
+        YAW += np.random.normal(0, 0.05, size=(YAW.shape[0]))
+        LEFT += np.random.normal(0, 0.05, size=(LEFT.shape[0]))
+        RIGHT += np.random.normal(0, 0.05, size=(RIGHT.shape[0]))
+        
+        #constrain the points to be within the lower and upper bounds
+        X = np.clip(X, x_lower_array[environment], x_upper_array[environment])
+        Y = np.clip(Y, y_lower_array[environment], y_upper_array[environment])
+        YAW = np.clip(YAW, yaw_lower_array[environment], yaw_upper_array[environment])
+        LEFT = np.clip(LEFT, left_door_lower_array[environment], left_door_upper_array[environment])
+        RIGHT = np.clip(RIGHT, right_door_lower_array[environment], right_door_upper_array[environment])
+        
         number_of_samples = X.shape[0]
         print("Number of samples: ", number_of_samples)
 

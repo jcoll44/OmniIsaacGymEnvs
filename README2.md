@@ -2,9 +2,9 @@
 
 ## About this repository
 
-This repository contains a metacognition RL environment. It includes collecting the training script for training an agent, a script for collecting the training and test datasets. 
+This repository contains a metacognition RL environment. It includes code for trainging an agent to complete the taska and code for collecting the training and test datasets. 
 
-Once the datasets are collected, metacognitive agents can be trained and assessed using the repository found here.........
+Once the datasets are collected, metacognitive agents can be trained and assessed using the metacognitive_models repository found here.........
 
 ## Training an agent
 
@@ -13,6 +13,7 @@ Start the docker container
 ```bash
 ./docker/run_docker.sh
 ```
+
 Either train your own agent
 
 ```bash
@@ -30,5 +31,5 @@ OR test the pretrained agent and view it using the [Omniverse Streaming Client](
 Run the following script to collect the training and test datasets for the Jackal task. The datasets will be saved in the `data` folder.
 
 ```bash
-PYTHON_PATH scripts/rlgames_confidence_dataset_collection.py task=Jackal headless=True checkpoint=runs/Jackal/nn/Jackal.pth
+/isaac-sim/python.sh scripts/rlgames_meta_dataset.py task=Jackal headless=True test=True checkpoint=runs/Jackal/nn/Jackal.pth enable_livestream=False num_envs=1
 ```
