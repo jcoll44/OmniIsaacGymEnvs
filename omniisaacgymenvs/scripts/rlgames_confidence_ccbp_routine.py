@@ -143,7 +143,7 @@ def parse_hydra_configs(cfg: DictConfig):
     for environment in range(2):
         print("Environment: ", environment)
         # Create the assessment environment
-        num_points = 2000
+        num_points = 500
 
         # file_path = "runs/Jackal/nn/Jackal_"+str(environment+1)+".pth"
         # if cfg.checkpoint:
@@ -200,10 +200,10 @@ def parse_hydra_configs(cfg: DictConfig):
 
 
         success_rate = 1.0
-        noise = 0.38
-        # while success_rate>0.75:
-        # noise += 0.05
-        env._task.update_noise_value(noise)
+        # noise = 0.38
+        # # while success_rate>0.75:
+        # # noise += 0.05
+        # env._task.update_noise_value(noise)
 
 
 

@@ -87,7 +87,7 @@ class JackalTask(RLTask):
         self._noise_amount = self._task_cfg["env"]["noiseAmount"]
 
         self._num_observations = 5
-        self._num_actions = 5
+        self._num_actions = 4
 
         self.action_space = spaces.Discrete(self._num_actions)
 
@@ -285,7 +285,7 @@ class JackalTask(RLTask):
         body_velocities[:,0] = torch.where(actions == 1, self.linear_velocity_turn, body_velocities[:,0])
         body_velocities[:,0] = torch.where(actions == 2, self.linear_velocity_turn, body_velocities[:,0])
         body_velocities[:,0] = torch.where(actions == 3 , -self.linear_velocity, body_velocities[:,0])
-        body_velocities[:,0] = torch.where(actions == 4 , 0.0, body_velocities[:,0])
+        # body_velocities[:,0] = torch.where(actions == 4 , 0.0, body_velocities[:,0])
         # angular velocity
         body_velocities[:,1] = torch.where(actions == 1, self.angular_velocity, 0.0)
         body_velocities[:,1] = torch.where(actions == 2, -self.angular_velocity, body_velocities[:,1])
@@ -368,7 +368,7 @@ class JackalTask(RLTask):
         # pole_vel = self.obs_buf[:, 3]
 
         dist = ((jackal_pos-self.target_position[0:2])**2).sum(axis=1)
-        reward1 = torch.exp(dist/10)*-1
+        reward1 = torch.exp(dist/10)*-0.1
         reward2 = torch.where(torch.abs(dist) < 0.2, 100, reward1)
         reward = reward2
 

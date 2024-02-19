@@ -123,7 +123,7 @@ def parse_hydra_configs(cfg: DictConfig):
     env = VecEnvRLGames(headless=headless, sim_device=cfg.device_id, enable_livestream=cfg.enable_livestream, enable_viewport=enable_viewport)
     # env = VecEnvRLGames(headless=headless, sim_device=cfg.device_id)
     task = initialize_task(cfg_dict, env)
-    cfg.num_envs = cfg_dict["task"]["env"]["numEnvs"]
+    cfg.num_envs = 1
     # cfg.maxEpisodeLength = 500
 
 
@@ -249,9 +249,9 @@ def parse_hydra_configs(cfg: DictConfig):
         env._world.step(render=render)
 
         if environment == 0:
-            save_path = "data/id/training/"
+            save_path = "data/ood/train/"
         else:
-            save_path = "data/id/test/"
+            save_path = "data/ood/test/"
 
         for i in range(X.shape[0]):
             env.sim_frame_count=0
@@ -263,7 +263,7 @@ def parse_hydra_configs(cfg: DictConfig):
                 if env._world.is_playing():
                     if env.sim_frame_count == 0:
                         env._task.set_start_state(np.expand_dims(X[i],0), np.expand_dims(Y[i],0), np.expand_dims(YAW[i],0), np.expand_dims(LEFT[i],0), np.expand_dims(RIGHT[i],0))
-                        for j in range(10):
+                        for j in range(4):
                             env._world.step(render=render)
                     obs = env._task.get_observations()["jackal_view"]["obs_buf"]
                     obs = obs.view(cfg.num_envs, -1)
@@ -273,11 +273,13 @@ def parse_hydra_configs(cfg: DictConfig):
                     env._task.pre_physics_step(actions)
                     env._world.step(render=render)
                     obs_buf, rew_buf, reset_buf, extras  = env._task.post_physics_step()
-                    collected_samples = dataset.add_step(obs.cpu().detach().numpy(),rew_buf.cpu().detach().numpy(),reset_buf.cpu().detach().numpy())
-                    image = env._task.get_image()
-                    video.append(image.cpu().detach().numpy()[0,:,:,:])
+                    dataset.add_step(obs.cpu().detach().numpy(),rew_buf.cpu().detach().numpy(),reset_buf.cpu().detach().numpy())
+                    if render:
+                        image = env._task.get_image()
+                        video.append(image.cpu().detach().numpy()[0,:,:,:])
                     if reset_buf.cpu().detach().numpy()[0] == 1:
-                        save_video(video, save_path+str(i)+"/")
+                        if render:
+                            save_video(video, save_path+str(i)+"/")
                         if rew_buf[0] > 0 and reset_buf[0] == 1:
                             dataset.add_label(1)
                         else:
@@ -285,7 +287,8 @@ def parse_hydra_configs(cfg: DictConfig):
                         dataset.add_frame_count(env.sim_frame_count)
                         break
                     if env.sim_frame_count==0:
-                        save_first_frame(image, save_path+str(i)+"/")
+                        if render: 
+                            save_first_frame(image, save_path+str(i)+"/")
                     env.sim_frame_count += 1
                 else:
                     env._world.step(render=render)  
@@ -301,7 +304,13 @@ def parse_hydra_configs(cfg: DictConfig):
         # Save Training datapoints
         dataset.save(save_path+"dataset.csv", save_path+"metadata.csv")
 
-
+        # Save stats to a file
+        with open(save_path+"stats.txt", "w") as file:
+            file.write("Success rate: "+str(success_rate)+"\n")
+            file.write("Number of Successful states: "+str(len(dataset.successful_states))+"\n")
+            file.write("Number of failure states: "+str(len(dataset.unsuccessful_states))+"\n")
+            file.write("Number of samples: "+str(number_of_samples)+"\n")
+            file.write("Number of frames: "+str(env.sim_frame_count)+"\n")
 
 
 

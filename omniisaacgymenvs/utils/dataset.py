@@ -30,11 +30,11 @@ class Dataset(object):
         self.current_env_index +=1
 
     def add_step(self, obs, reward, reset):
-    		self.episode_list[self.current_env_index].append(obs[0,:])
-    		if reward[0] > 0 and reset[0] == 1:
-    			self.successful_states.append(self.episode_list[self.current_env_index])
-    		elif reset[0] == 1:
-    			self.unsuccessful_states.append(self.episode_list[self.current_env_index])
+        self.episode_list[self.current_env_index].append(obs[0,:])
+        if reward[0] > 0 and reset[0] == 1:
+            self.successful_states.append(self.episode_list[self.current_env_index])
+        elif reset[0] == 1:
+            self.unsuccessful_states.append(self.episode_list[self.current_env_index])
 
     def get_success_rate(self):
         return len(self.successful_states)/(len(self.successful_states)+len(self.unsuccessful_states))
