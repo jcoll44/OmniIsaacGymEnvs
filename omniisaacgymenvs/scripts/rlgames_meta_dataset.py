@@ -248,9 +248,9 @@ def parse_hydra_configs(cfg: DictConfig):
         env._world.step(render=render)
 
         if environment == 0:
-            save_path = "data/test/train/"
+            save_path = "data/ood/train/"
         else:
-            save_path = "data/test/test/"
+            save_path = "data/ood/test/"
 
         for i in range(X.shape[0]):
             env.sim_frame_count=0
@@ -273,7 +273,6 @@ def parse_hydra_configs(cfg: DictConfig):
                     # env._task.pre_physics_step(actions)
                     obs, rew_buf, reset_buf, extras = env.step(actions)
                     obs = obs["obs"]
-                    print(obs)
 
                     # env._world.step(render=render)
                     # obs_buf, rew_buf, reset_buf, extras  = env._task.post_physics_step()

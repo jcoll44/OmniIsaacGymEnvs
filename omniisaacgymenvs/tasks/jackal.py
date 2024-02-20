@@ -368,7 +368,7 @@ class JackalTask(RLTask):
         # pole_vel = self.obs_buf[:, 3]
 
         dist = ((jackal_pos-self.target_position[0:2])**2).sum(axis=1)
-        reward1 = torch.exp(dist/10)*-0.1
+        reward1 = torch.exp(dist/10)*-0.4
         reward2 = torch.where(torch.abs(dist) < 0.2, 100, reward1)
         reward = reward2
 
