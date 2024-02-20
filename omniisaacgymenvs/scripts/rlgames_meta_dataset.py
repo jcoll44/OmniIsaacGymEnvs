@@ -124,7 +124,6 @@ def parse_hydra_configs(cfg: DictConfig):
     # env = VecEnvRLGames(headless=headless, sim_device=cfg.device_id)
     task = initialize_task(cfg_dict, env)
     cfg.num_envs = 1
-    # cfg.maxEpisodeLength = 500
 
 
     # ensure checkpoints can be specified as relative paths
@@ -249,9 +248,9 @@ def parse_hydra_configs(cfg: DictConfig):
         env._world.step(render=render)
 
         if environment == 0:
-            save_path = "data/ood/train/"
+            save_path = "data/test/train/"
         else:
-            save_path = "data/ood/test/"
+            save_path = "data/test/test/"
 
         for i in range(X.shape[0]):
             env.sim_frame_count=0
@@ -265,14 +264,19 @@ def parse_hydra_configs(cfg: DictConfig):
                         env._task.set_start_state(np.expand_dims(X[i],0), np.expand_dims(Y[i],0), np.expand_dims(YAW[i],0), np.expand_dims(LEFT[i],0), np.expand_dims(RIGHT[i],0))
                         for j in range(4):
                             env._world.step(render=render)
-                    obs = env._task.get_observations()["jackal_view"]["obs_buf"]
-                    obs = obs.view(cfg.num_envs, -1)
-                    # actions = torch.tensor(np.array([env.action_space.sample() for _ in range(env.num_envs)]), device=task.rl_device)
+                        obs = env._task.get_observations()["jackal_view"]["obs_buf"]
+                        obs = obs.view(cfg.num_envs, -1)
+
+                    
                     actions = agent.get_action(obs)
-                    # actions = actions.unsqueeze(0)
-                    env._task.pre_physics_step(actions)
-                    env._world.step(render=render)
-                    obs_buf, rew_buf, reset_buf, extras  = env._task.post_physics_step()
+
+                    # env._task.pre_physics_step(actions)
+                    obs, rew_buf, reset_buf, extras = env.step(actions)
+                    obs = obs["obs"]
+                    print(obs)
+
+                    # env._world.step(render=render)
+                    # obs_buf, rew_buf, reset_buf, extras  = env._task.post_physics_step()
                     dataset.add_step(obs.cpu().detach().numpy(),rew_buf.cpu().detach().numpy(),reset_buf.cpu().detach().numpy())
                     if render:
                         image = env._task.get_image()
@@ -289,7 +293,7 @@ def parse_hydra_configs(cfg: DictConfig):
                     if env.sim_frame_count==0:
                         if render: 
                             save_first_frame(image, save_path+str(i)+"/")
-                    env.sim_frame_count += 1
+                    # env.sim_frame_count += 1
                 else:
                     env._world.step(render=render)  
 
