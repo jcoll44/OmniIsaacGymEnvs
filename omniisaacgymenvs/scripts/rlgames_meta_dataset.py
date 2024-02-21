@@ -248,9 +248,9 @@ def parse_hydra_configs(cfg: DictConfig):
         env._world.step(render=render)
 
         if environment == 0:
-            save_path = "data/ood/train/"
+            save_path = "data/id/train/"
         else:
-            save_path = "data/ood/test/"
+            save_path = "data/id/test/"
 
         for i in range(X.shape[0]):
             env.sim_frame_count=0

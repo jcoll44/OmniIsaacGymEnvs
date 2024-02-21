@@ -1,6 +1,6 @@
 __pycache___
 __pycache__/
-runs
+
 omniisaacgymenvs.egg-info/
 checkpoints
 omniisaacgymenvs/wandb
@@ -8,9 +8,11 @@ omniisaacgymenvs/wandb
 omniisaacgymenvs/recordings/
 
 *.etli
-omniisaacgymenvs/data/*/*/*.png
-omniisaacgymenvs/data/*/*/*.mp4
-omniisaacgymenvs/data/id/test/dataset.csv
-omniisaacgymenvs/data/id/test/metadata.csv
 *.png
 *.mp4
+
+omniisaacgymenvs/runs/Jackal/summaries
+omniisaacgymenvs/runs/Jackal/nn/*.pth
+!Jackal_ood.pth
+!Jackal_id.pth
+
